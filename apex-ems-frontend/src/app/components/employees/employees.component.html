@@ -1,0 +1,348 @@
+<div class="employees-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1><i class="pi pi-users"></i> Employee Management</h1>
+      <p>Manage your organization's employee records</p>
+    </div>
+    <div class="page-actions">
+      <button class="apex-button apex-button-success" (click)="addEmployee()">
+        <i class="pi pi-plus"></i> Add Employee
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="apex-card">
+    <div class="apex-card-header">
+      <i class="pi pi-filter"></i> Filters & Search
+    </div>
+    <div class="apex-card-body">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label class="apex-form-label">Search</label>
+          <input 
+            type="text" 
+            class="apex-form-control" 
+            placeholder="Search by name, email, or employee ID"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          >
+        </div>
+        <div class="filter-group">
+          <label class="apex-form-label">Department</label>
+          <select 
+            class="apex-form-control" 
+            [(ngModel)]="selectedDepartment"
+            (change)="onDepartmentChange()"
+          >
+            <option value="">All Departments</option>
+            <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="apex-form-label">Status</label>
+          <select 
+            class="apex-form-control" 
+            [(ngModel)]="selectedStatus"
+            (change)="onStatusChange()"
+          >
+            <option value="">All Statuses</option>
+            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Table -->
+  <div class="apex-card">
+    <div class="apex-card-header">
+      <i class="pi pi-table"></i> Employee List ({{ totalItems }} employees)
+    </div>
+    <div class="apex-card-body">
+      <div class="table-container">
+        <table class="apex-table">
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th>Join Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let employee of paginatedEmployees">
+              <td>{{ employee.employeeId }}</td>
+              <td>{{ employee.firstName }} {{ employee.lastName }}</td>
+              <td>{{ employee.email }}</td>
+              <td>{{ employee.department }}</td>
+              <td>{{ employee.position }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(employee.status)">
+                  {{ employee.status }}
+                </span>
+              </td>
+              <td>{{ formatDate(employee.joinDate) }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="action-btn view-btn" 
+                    (click)="viewEmployee(employee)"
+                    title="View Details"
+                  >
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button 
+                    class="action-btn edit-btn" 
+                    (click)="editEmployee(employee)"
+                    title="Edit Employee"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button 
+                    class="action-btn delete-btn" 
+                    (click)="deleteEmployee(employee)"
+                    title="Delete Employee"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div *ngIf="paginatedEmployees.length === 0" class="empty-state">
+          <i class="pi pi-users empty-icon"></i>
+          <h3>No employees found</h3>
+          <p>Try adjusting your search criteria or add a new employee.</p>
+          <button class="apex-button apex-button-success" (click)="addEmployee()">
+            <i class="pi pi-plus"></i> Add First Employee
+          </button>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button 
+          class="pagination-btn" 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 1"
+        >
+          <i class="pi pi-chevron-left"></i>
+        </button>
+        
+        <span class="pagination-info">
+          Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} total)
+        </span>
+        
+        <button 
+          class="pagination-btn" 
+          (click)="nextPage()" 
+          [disabled]="currentPage === totalPages"
+        >
+          <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Employee Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="pi" [ngClass]="modalMode === 'add' ? 'pi-plus' : modalMode === 'edit' ? 'pi-pencil' : 'pi-eye'"></i>
+        {{ modalMode === 'add' ? 'Add Employee' : modalMode === 'edit' ? 'Edit Employee' : 'Employee Details' }}
+      </h2>
+      <button class="modal-close" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form *ngIf="modalMode !== 'view'">
+        <div class="form-grid">
+          <div class="apex-form-group">
+            <label class="apex-form-label">First Name *</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.firstName"
+              name="firstName"
+              required
+            >
+          </div>
+          
+          <div class="apex-form-group">
+            <label class="apex-form-label">Last Name *</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.lastName"
+              name="lastName"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Email *</label>
+            <input 
+              type="email" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.email"
+              name="email"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Phone</label>
+            <input 
+              type="tel" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.phone"
+              name="phone"
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Department *</label>
+            <select 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.department"
+              name="department"
+              required
+            >
+              <option value="">Select Department</option>
+              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Position *</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.position"
+              name="position"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Status</label>
+            <select 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.status"
+              name="status"
+            >
+              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+            </select>
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Join Date *</label>
+            <input 
+              type="date" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.joinDate"
+              name="joinDate"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Salary</label>
+            <input 
+              type="number" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.salary"
+              name="salary"
+              min="0"
+              step="1000"
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Manager</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedEmployee.manager"
+              name="manager"
+            >
+          </div>
+        </div>
+      </form>
+
+      <!-- View Mode -->
+      <div *ngIf="modalMode === 'view'" class="employee-details">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Employee ID:</label>
+            <span>{{ selectedEmployee.employeeId }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Full Name:</label>
+            <span>{{ selectedEmployee.firstName }} {{ selectedEmployee.lastName }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Email:</label>
+            <span>{{ selectedEmployee.email }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Phone:</label>
+            <span>{{ selectedEmployee.phone }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Department:</label>
+            <span>{{ selectedEmployee.department }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Position:</label>
+            <span>{{ selectedEmployee.position }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Status:</label>
+            <span class="status-badge" [ngClass]="getStatusClass(selectedEmployee.status)">
+              {{ selectedEmployee.status }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Join Date:</label>
+            <span>{{ formatDate(selectedEmployee.joinDate) }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Salary:</label>
+            <span>{{ formatCurrency(selectedEmployee.salary) }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Manager:</label>
+            <span>{{ selectedEmployee.manager }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="apex-button apex-button-secondary" (click)="closeModal()">
+        {{ modalMode === 'view' ? 'Close' : 'Cancel' }}
+      </button>
+      <button 
+        *ngIf="modalMode !== 'view'" 
+        class="apex-button apex-button-success" 
+        (click)="saveEmployee()"
+      >
+        {{ modalMode === 'add' ? 'Add Employee' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,488 @@
+/* Oracle APEX-like Global Styles */
+/* PrimeNG styles commented out - using custom styling */
+/* @import 'primeng/resources/themes/bootstrap4-light-blue/theme.css'; */
+/* @import 'primeng/resources/primeng.css'; */
+@import 'primeicons/primeicons.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Oracle APEX Color Scheme */
+:root {
+  --apex-primary: #0066cc;
+  --apex-secondary: #004499;
+  --apex-accent: #ff6600;
+  --apex-background: #f8f9fa;
+  --apex-surface: #ffffff;
+  --apex-border: #dee2e6;
+  --apex-text: #333333;
+  --apex-text-secondary: #6c757d;
+  --apex-success: #28a745;
+  --apex-warning: #ffc107;
+  --apex-danger: #dc3545;
+  --apex-info: #17a2b8;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Utility classes */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-3 {
+  padding: 1rem;
+}
+
+/* Card styles similar to APEX */
+.apex-card {
+  background: var(--apex-surface);
+  border: 1px solid var(--apex-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.apex-card-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--apex-border);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--apex-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.apex-card-body {
+  padding: 1rem;
+  overflow: hidden;
+}
+
+/* Button styles */
+.apex-button {
+  background: var(--apex-primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.apex-button:hover {
+  background: var(--apex-secondary);
+}
+
+.apex-button-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.apex-button-success {
+  background: var(--apex-success);
+  color: white;
+}
+
+.apex-button-danger {
+  background: var(--apex-danger);
+  color: white;
+}
+
+/* Small button variant for card headers */
+.apex-button-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 12px;
+}
+
+/* Table styles */
+.apex-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--apex-surface);
+  border: 1px solid var(--apex-border);
+}
+
+.apex-table th,
+.apex-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--apex-border);
+}
+
+.apex-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: var(--apex-text);
+}
+
+.apex-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Form styles */
+.apex-form-group {
+  margin-bottom: 1rem;
+}
+
+.apex-form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: var(--apex-text);
+}
+
+.apex-form-control {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--apex-border);
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.apex-form-control:focus {
+  outline: none;
+  border-color: var(--apex-primary);
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
+/* Layout classes */
+.main-layout {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.content-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sidebar {
+  background: var(--apex-surface);
+  border-right: 1px solid var(--apex-border);
+  overflow-y: auto;
+}
+
+.main-content {
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--apex-background);
+}
+
+/* Navigation */
+.apex-nav {
+  background: var(--apex-primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.apex-nav-brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: white;
+}
+
+.apex-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Sidebar navigation */
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  border-bottom: 1px solid var(--apex-border);
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--apex-text);
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.sidebar-nav a:hover {
+  background: #f8f9fa;
+}
+
+.sidebar-nav a.active {
+  background: var(--apex-primary);
+  color: white;
+}
+
+/* Dashboard specific styles */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-stat {
+  background: var(--apex-surface);
+  border: 1px solid var(--apex-border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--apex-primary);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-stat-label {
+  color: var(--apex-text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* System Status Grid Layout (similar to Quick Actions) */
+.system-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.status-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--apex-border);
+  border-radius: 6px;
+  background: var(--apex-surface);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.status-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.status-card.status-online {
+  border-left: 4px solid var(--apex-success);
+}
+
+.status-card.status-warning {
+  border-left: 4px solid var(--apex-warning);
+}
+
+.status-card.status-offline {
+  border-left: 4px solid var(--apex-danger);
+}
+
+.status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.status-online .status-icon {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--apex-success);
+}
+
+.status-warning .status-icon {
+  background: rgba(255, 193, 7, 0.1);
+  color: var(--apex-warning);
+}
+
+.status-offline .status-icon {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--apex-danger);
+}
+
+.status-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--apex-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.status-content p {
+  font-size: 12px;
+  color: var(--apex-text-secondary);
+  margin: 0;
+}
+
+/* Dashboard Content Grid Layout */
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Left column contains Quick Actions and System Status */
+.dashboard-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Right column contains Recent Activities */
+.dashboard-right-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Make Recent Activities card match the height of left column */
+.dashboard-right-column .apex-card {
+  height: fit-content;
+  width: 100%;
+  min-height: 500px;
+}
+
+.dashboard-right-column .apex-card-body {
+  min-height: 400px;
+}
+
+/* Ensure activities list fills the available space */
+.activities-list {
+  min-height: 350px;
+}
+
+/* Ensure cards in both columns have consistent width */
+.dashboard-left-column .apex-card,
+.dashboard-right-column .apex-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dashboard specific container adjustments */
+.dashboard-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Ensure equal padding for all dashboard sections */
+.dashboard-stats,
+.dashboard-content {
+  margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+}

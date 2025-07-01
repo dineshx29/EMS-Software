@@ -1,0 +1,302 @@
+<div class="users-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1><i class="pi pi-user"></i> User Management</h1>
+      <p>Manage user accounts and access permissions</p>
+    </div>
+    <div class="page-actions">
+      <button class="apex-button apex-button-success" (click)="addUser()">
+        <i class="pi pi-plus"></i> Add User
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="apex-card">
+    <div class="apex-card-header">
+      <i class="pi pi-filter"></i> Filters & Search
+    </div>
+    <div class="apex-card-body">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label class="apex-form-label">Search</label>
+          <input 
+            type="text" 
+            class="apex-form-control" 
+            placeholder="Search by username, email, or name"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          >
+        </div>
+        <div class="filter-group">
+          <label class="apex-form-label">Role</label>
+          <select 
+            class="apex-form-control" 
+            [(ngModel)]="selectedRole"
+            (change)="onRoleChange()"
+          >
+            <option value="">All Roles</option>
+            <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="apex-form-label">Status</label>
+          <select 
+            class="apex-form-control" 
+            [(ngModel)]="selectedStatus"
+            (change)="onStatusChange()"
+          >
+            <option value="">All Statuses</option>
+            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="apex-card">
+    <div class="apex-card-header">
+      <i class="pi pi-table"></i> User List ({{ filteredUsers.length }} users)
+    </div>
+    <div class="apex-card-body">
+      <div class="table-container">
+        <table class="apex-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Last Login</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filteredUsers">
+              <td>{{ user.username }}</td>
+              <td>{{ user.firstName }} {{ user.lastName }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                  {{ user.role }}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(user.status)">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td>{{ formatDateTime(user.lastLogin) }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="action-btn view-btn" 
+                    (click)="viewUser(user)"
+                    title="View Details"
+                  >
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button 
+                    class="action-btn edit-btn" 
+                    (click)="editUser(user)"
+                    title="Edit User"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button 
+                    class="action-btn reset-btn" 
+                    (click)="resetPassword(user)"
+                    title="Reset Password"
+                  >
+                    <i class="pi pi-key"></i>
+                  </button>
+                  <button 
+                    class="action-btn delete-btn" 
+                    (click)="deleteUser(user)"
+                    title="Delete User"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredUsers.length === 0" class="empty-state">
+          <i class="pi pi-user empty-icon"></i>
+          <h3>No users found</h3>
+          <p>Try adjusting your search criteria or add a new user.</p>
+          <button class="apex-button apex-button-success" (click)="addUser()">
+            <i class="pi pi-plus"></i> Add First User
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="pi" [ngClass]="modalMode === 'add' ? 'pi-plus' : modalMode === 'edit' ? 'pi-pencil' : 'pi-eye'"></i>
+        {{ modalMode === 'add' ? 'Add User' : modalMode === 'edit' ? 'Edit User' : 'User Details' }}
+      </h2>
+      <button class="modal-close" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form *ngIf="modalMode !== 'view'">
+        <div class="form-grid">
+          <div class="apex-form-group">
+            <label class="apex-form-label">Username *</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.username"
+              name="username"
+              required
+              [disabled]="modalMode === 'edit'"
+            >
+          </div>
+          
+          <div class="apex-form-group">
+            <label class="apex-form-label">Email *</label>
+            <input 
+              type="email" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.email"
+              name="email"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">First Name *</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.firstName"
+              name="firstName"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Last Name *</label>
+            <input 
+              type="text" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.lastName"
+              name="lastName"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Role *</label>
+            <select 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.role"
+              name="role"
+              required
+            >
+              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+          </div>
+
+          <div class="apex-form-group">
+            <label class="apex-form-label">Status</label>
+            <select 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.status"
+              name="status"
+            >
+              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+            </select>
+          </div>
+
+          <div class="apex-form-group" *ngIf="modalMode === 'add'">
+            <label class="apex-form-label">Password *</label>
+            <input 
+              type="password" 
+              class="apex-form-control" 
+              [(ngModel)]="selectedUser.password"
+              name="password"
+              required
+            >
+          </div>
+
+          <div class="apex-form-group" *ngIf="modalMode === 'add'">
+            <label class="apex-form-label">Confirm Password *</label>
+            <input 
+              type="password" 
+              class="apex-form-control" 
+              name="confirmPassword"
+              required
+            >
+          </div>
+        </div>
+      </form>
+
+      <!-- View Mode -->
+      <div *ngIf="modalMode === 'view'" class="user-details">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <label>Username:</label>
+            <span>{{ selectedUser.username }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Full Name:</label>
+            <span>{{ selectedUser.firstName }} {{ selectedUser.lastName }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Email:</label>
+            <span>{{ selectedUser.email }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Role:</label>
+            <span class="role-badge" [ngClass]="getRoleClass(selectedUser.role)">
+              {{ selectedUser.role }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Status:</label>
+            <span class="status-badge" [ngClass]="getStatusClass(selectedUser.status)">
+              {{ selectedUser.status }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Last Login:</label>
+            <span>{{ formatDateTime(selectedUser.lastLogin) }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Created Date:</label>
+            <span>{{ formatDateTime(selectedUser.createdDate) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="apex-button apex-button-secondary" (click)="closeModal()">
+        {{ modalMode === 'view' ? 'Close' : 'Cancel' }}
+      </button>
+      <button 
+        *ngIf="modalMode !== 'view'" 
+        class="apex-button apex-button-success" 
+        (click)="saveUser()"
+      >
+        {{ modalMode === 'add' ? 'Add User' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

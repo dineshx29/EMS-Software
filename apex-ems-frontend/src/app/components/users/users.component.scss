@@ -1,0 +1,404 @@
+/* User Management Component Styles */
+
+.users-container {
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Reuse employee styles as base */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--apex-surface);
+  border: 1px solid var(--apex-border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--apex-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-title p {
+  margin: 0.5rem 0 0 0;
+  color: var(--apex-text-secondary);
+  font-size: 0.9rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.apex-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--apex-surface);
+  font-size: 0.9rem;
+}
+
+.apex-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: var(--apex-text);
+  padding: 1rem 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid var(--apex-border);
+  white-space: nowrap;
+}
+
+.apex-table td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid var(--apex-border);
+  vertical-align: middle;
+}
+
+.apex-table tbody tr:hover {
+  background-color: rgba(0, 102, 204, 0.05);
+}
+
+/* Status and Role Badges */
+.status-badge, .role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Status Badge Colors */
+.status-active {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--apex-success);
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.status-inactive {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--apex-danger);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.status-suspended {
+  background: rgba(255, 193, 7, 0.1);
+  color: var(--apex-warning);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+/* Role Badge Colors */
+.role-super-admin {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--apex-danger);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.role-manager {
+  background: rgba(0, 102, 204, 0.1);
+  color: var(--apex-primary);
+  border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+.role-hr-admin {
+  background: rgba(255, 102, 0, 0.1);
+  color: var(--apex-accent);
+  border: 1px solid rgba(255, 102, 0, 0.2);
+}
+
+.role-employee {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--apex-success);
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.role-viewer {
+  background: rgba(108, 117, 125, 0.1);
+  color: var(--apex-text-secondary);
+  border: 1px solid rgba(108, 117, 125, 0.2);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.view-btn {
+  background: rgba(23, 162, 184, 0.1);
+  color: var(--apex-info);
+}
+
+.view-btn:hover {
+  background: var(--apex-info);
+  color: white;
+}
+
+.edit-btn {
+  background: rgba(255, 193, 7, 0.1);
+  color: var(--apex-warning);
+}
+
+.edit-btn:hover {
+  background: var(--apex-warning);
+  color: white;
+}
+
+.reset-btn {
+  background: rgba(0, 102, 204, 0.1);
+  color: var(--apex-primary);
+}
+
+.reset-btn:hover {
+  background: var(--apex-primary);
+  color: white;
+}
+
+.delete-btn {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--apex-danger);
+}
+
+.delete-btn:hover {
+  background: var(--apex-danger);
+  color: white;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--apex-text-secondary);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: var(--apex-border);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--apex-text);
+}
+
+.empty-state p {
+  margin: 0 0 1.5rem 0;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-container {
+  background: var(--apex-surface);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--apex-border);
+  background: #f8f9fa;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--apex-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--apex-text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--apex-border);
+  background: #f8f9fa;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.user-details {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: var(--apex-text-secondary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item span {
+  color: var(--apex-text);
+  font-size: 0.95rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-container {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .apex-table {
+    font-size: 0.8rem;
+  }
+
+  .apex-table th,
+  .apex-table td {
+    padding: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}

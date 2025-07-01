@@ -1,0 +1,138 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1><i class="pi pi-chart-line"></i> Dashboard</h1>
+    </div>
+  </div>
+
+  <!-- Dashboard Statistics Cards -->
+  <div class="dashboard-stats">
+    <div class="stat-card" *ngFor="let stat of dashboardStats" [ngClass]="getColorClass(stat.color)">
+      <div class="stat-icon">
+        <i class="pi" [ngClass]="stat.icon"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-title">{{ stat.title }}</div>
+        <div class="stat-trend" [ngClass]="{'trend-up': stat.trendUp, 'trend-down': !stat.trendUp}">
+          <i class="pi" [ngClass]="stat.trendUp ? 'pi-arrow-up' : 'pi-arrow-down'"></i>
+          {{ stat.trend }} {{ stat.description }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content Grid -->
+  <div class="dashboard-content">
+    <!-- Left Column: Quick Actions + System Status -->
+    <div class="dashboard-left-column">
+      <!-- Quick Actions Panel -->
+      <div class="apex-card">
+        <div class="apex-card-header">
+          <i class="pi pi-bolt"></i> Quick Actions
+        </div>
+        <div class="apex-card-body">
+          <div class="quick-actions-grid">
+            <a 
+              *ngFor="let action of quickActions" 
+              [routerLink]="action.route" 
+              class="quick-action-item"
+              [ngClass]="'action-' + action.color"
+            >
+              <div class="action-icon">
+                <i class="pi" [ngClass]="action.icon"></i>
+              </div>
+              <div class="action-content">
+                <h4>{{ action.title }}</h4>
+                <p>{{ action.description }}</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status Panel -->
+      <div class="apex-card">
+        <div class="apex-card-header">
+          <i class="pi pi-server"></i> System Status
+        </div>
+        <div class="apex-card-body">
+          <div class="system-status-grid">
+            <div class="status-card status-online">
+              <div class="status-icon">
+                <i class="pi pi-database"></i>
+              </div>
+              <div class="status-content">
+                <h4>Database Server</h4>
+                <p>Online</p>
+              </div>
+            </div>
+            <div class="status-card status-online">
+              <div class="status-icon">
+                <i class="pi pi-globe"></i>
+              </div>
+              <div class="status-content">
+                <h4>Web Server</h4>
+                <p>Running</p>
+              </div>
+            </div>
+            <div class="status-card status-warning">
+              <div class="status-icon">
+                <i class="pi pi-chart-pie"></i>
+              </div>
+              <div class="status-content">
+                <h4>Storage Usage</h4>
+                <p>75% Used</p>
+              </div>
+            </div>
+            <div class="status-card status-online">
+              <div class="status-icon">
+                <i class="pi pi-cog"></i>
+              </div>
+              <div class="status-content">
+                <h4>API Service</h4>
+                <p>Healthy</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Recent Activities -->
+    <div class="dashboard-right-column">
+      <!-- Recent Activities -->
+      <div class="apex-card">
+        <div class="apex-card-header">
+          <div class="card-header-left">
+            <i class="pi pi-history"></i> Recent Activities
+          </div>
+          <div class="card-header-right">
+            <button class="apex-button apex-button-success apex-button-sm">
+              <i class="pi pi-refresh"></i> Refresh
+            </button>
+          </div>
+        </div>
+        <div class="apex-card-body">
+          <div class="activities-list">
+            <div 
+              *ngFor="let activity of recentActivities" 
+              class="activity-item"
+              [ngClass]="getActivityTypeClass(activity.type)"
+            >
+              <div class="activity-icon">
+                <i class="pi" [ngClass]="activity.icon"></i>
+              </div>
+              <div class="activity-content">
+                <div class="activity-user">{{ activity.user }}</div>
+                <div class="activity-action">{{ activity.action }}</div>
+                <div class="activity-time">{{ activity.time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

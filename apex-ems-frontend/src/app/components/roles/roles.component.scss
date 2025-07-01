@@ -1,0 +1,187 @@
+.roles-container {
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--apex-surface);
+  border: 1px solid var(--apex-border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--apex-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.page-title p {
+  margin: 0.5rem 0 0 0;
+  color: var(--apex-text-secondary);
+  font-size: 0.9rem;
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.role-card {
+  background: var(--apex-surface);
+  border: 1px solid var(--apex-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.role-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--apex-primary);
+  font-size: 1.25rem;
+}
+
+.role-info p {
+  margin: 0;
+  color: var(--apex-text-secondary);
+  font-size: 0.9rem;
+}
+
+.role-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: rgba(255, 193, 7, 0.1);
+  color: var(--apex-warning);
+}
+
+.edit-btn:hover {
+  background: var(--apex-warning);
+  color: white;
+}
+
+.delete-btn {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--apex-danger);
+}
+
+.delete-btn:hover {
+  background: var(--apex-danger);
+  color: white;
+}
+
+.role-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--apex-border);
+  border-bottom: 1px solid var(--apex-border);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--apex-text-secondary);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--apex-success);
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.role-permissions h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  color: var(--apex-text);
+}
+
+.permissions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.permission-tag {
+  background: rgba(0, 102, 204, 0.1);
+  color: var(--apex-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .role-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

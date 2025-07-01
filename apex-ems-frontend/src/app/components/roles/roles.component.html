@@ -1,0 +1,57 @@
+<div class="roles-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1><i class="pi pi-shield"></i> Role Management</h1>
+      <p>Define roles and permissions for system access</p>
+    </div>
+    <div class="page-actions">
+      <button class="apex-button apex-button-success" (click)="addRole()">
+        <i class="pi pi-plus"></i> Add Role
+      </button>
+    </div>
+  </div>
+
+  <!-- Roles Cards -->
+  <div class="roles-grid">
+    <div class="role-card" *ngFor="let role of roles">
+      <div class="role-header">
+        <div class="role-info">
+          <h3>{{ role.name }}</h3>
+          <p>{{ role.description }}</p>
+        </div>
+        <div class="role-actions">
+          <button class="action-btn edit-btn" (click)="editRole(role)" title="Edit Role">
+            <i class="pi pi-pencil"></i>
+          </button>
+          <button class="action-btn delete-btn" (click)="deleteRole(role)" title="Delete Role">
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="role-stats">
+        <div class="stat-item">
+          <i class="pi pi-users"></i>
+          <span>{{ role.userCount }} Users</span>
+        </div>
+        <div class="stat-item">
+          <i class="pi pi-calendar"></i>
+          <span>Created: {{ role.createdDate }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="status-badge status-active">{{ role.status }}</span>
+        </div>
+      </div>
+
+      <div class="role-permissions">
+        <h4>Permissions:</h4>
+        <div class="permissions-list">
+          <span *ngFor="let permission of role.permissions" class="permission-tag">
+            {{ permission }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

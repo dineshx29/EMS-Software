@@ -1,0 +1,215 @@
+// App Component Specific Styles
+.apex-nav-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 2px solid #3498db;
+
+  .nav-header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .apex-logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #3498db;
+
+    i {
+      margin-right: 0.5rem;
+      font-size: 1.8rem;
+    }
+  }
+
+  .nav-header-center {
+    flex: 1;
+    text-align: center;
+
+    .apex-breadcrumb {
+      font-size: 1.1rem;
+      color: #ecf0f1;
+    }
+  }
+
+  .nav-header-right {
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .user-name {
+        font-weight: 600;
+        color: #3498db;
+      }
+
+      .user-role {
+        font-size: 0.9rem;
+        color: #bdc3c7;
+        background: rgba(52, 152, 219, 0.2);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+      }
+
+      button {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}
+
+.apex-container {
+  display: flex;
+  min-height: calc(100vh - 70px);
+  background-color: #f8f9fa;
+}
+
+.apex-sidebar {
+  width: 250px;
+  background: white;
+  border-right: 1px solid #e9ecef;
+  box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+  overflow-y: auto;
+
+  .sidebar-header {
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+
+    h4 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .menu-item {
+      .menu-link {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1.5rem;
+        color: #495057;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: all 0.2s ease;
+
+        i {
+          margin-right: 0.75rem;
+          font-size: 1.1rem;
+          width: 16px;
+          text-align: center;
+        }
+
+        span {
+          font-weight: 500;
+        }
+
+        &:hover {
+          background-color: #f8f9fa;
+          color: #2c3e50;
+          border-left-color: #3498db;
+        }
+
+        &.active {
+          background-color: #e3f2fd;
+          color: #1976d2;
+          border-left-color: #1976d2;
+          font-weight: 600;
+
+          i {
+            color: #1976d2;
+          }
+        }
+      }
+    }
+  }
+}
+
+.apex-content {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+
+  .content-wrapper {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .apex-nav-header {
+    .nav-header-center {
+      display: none;
+    }
+
+    .user-info {
+      .user-role {
+        display: none;
+      }
+    }
+  }
+
+  .apex-container {
+    flex-direction: column;
+  }
+
+  .apex-sidebar {
+    width: 100%;
+    order: 2;
+    max-height: 200px;
+
+    .sidebar-menu {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 1rem;
+
+      .menu-item {
+        flex-shrink: 0;
+
+        .menu-link {
+          flex-direction: column;
+          text-align: center;
+          padding: 0.5rem 1rem;
+          border-left: none;
+          border-bottom: 3px solid transparent;
+
+          i {
+            margin-right: 0;
+            margin-bottom: 0.25rem;
+          }
+
+          span {
+            font-size: 0.8rem;
+          }
+
+          &:hover,
+          &.active {
+            border-left: none;
+            border-bottom-color: #1976d2;
+          }
+        }
+      }
+    }
+  }
+
+  .apex-content {
+    order: 1;
+  }
+}
