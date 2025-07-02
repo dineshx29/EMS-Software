@@ -1,7 +1,7 @@
 /* User Management Component Styles */
 
 .users-container {
-  padding: 0;
+  padding: 20px;
   height: 100%;
   overflow-y: auto;
 }
@@ -10,35 +10,38 @@
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  background: var(--apex-surface);
-  border: 1px solid var(--apex-border);
-  border-radius: 4px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e6e6e6;
 }
 
 .page-title h1 {
-  margin: 0;
-  font-size: 1.75rem;
+  color: #0066cc;
+  margin: 0 0 8px 0;
+  font-size: 1.8rem;
   font-weight: 600;
-  color: var(--apex-text);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px;
 }
 
 .page-title p {
-  margin: 0.5rem 0 0 0;
-  color: var(--apex-text-secondary);
-  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  font-size: 1rem;
 }
 
+.page-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Filters */
 .filters-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
   align-items: end;
 }
 
@@ -47,179 +50,328 @@
   flex-direction: column;
 }
 
-.table-container {
+/* Table Styles */
+.table-responsive {
   overflow-x: auto;
-  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
 }
 
 .apex-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--apex-surface);
   font-size: 0.9rem;
 }
 
 .apex-table th {
   background: #f8f9fa;
-  font-weight: 600;
-  color: var(--apex-text);
-  padding: 1rem 0.75rem;
+  padding: 16px 12px;
   text-align: left;
-  border-bottom: 2px solid var(--apex-border);
-  white-space: nowrap;
+  font-weight: 600;
+  color: #0066cc;
+  border-bottom: 2px solid #e6e6e6;
 }
 
 .apex-table td {
-  padding: 1rem 0.75rem;
-  border-bottom: 1px solid var(--apex-border);
-  vertical-align: middle;
+  padding: 16px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
 }
 
 .apex-table tbody tr:hover {
-  background-color: rgba(0, 102, 204, 0.05);
+  background: #f8f9fa;
 }
 
-/* Status and Role Badges */
-.status-badge, .role-badge {
-  display: inline-flex;
+/* User Info */
+.user-info {
+  display: flex;
   align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e6f3ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0066cc;
+  font-size: 1.2rem;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.user-username {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Contact Info */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.email, .phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.email {
+  color: #0066cc;
+}
+
+.phone {
+  color: #666;
+}
+
+/* Role Info */
+.role-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
   font-size: 0.8rem;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  text-align: center;
+  width: fit-content;
 }
 
-/* Status Badge Colors */
-.status-active {
-  background: rgba(40, 167, 69, 0.1);
-  color: var(--apex-success);
-  border: 1px solid rgba(40, 167, 69, 0.2);
-}
-
-.status-inactive {
-  background: rgba(220, 53, 69, 0.1);
-  color: var(--apex-danger);
-  border: 1px solid rgba(220, 53, 69, 0.2);
-}
-
-.status-suspended {
-  background: rgba(255, 193, 7, 0.1);
-  color: var(--apex-warning);
-  border: 1px solid rgba(255, 193, 7, 0.2);
-}
-
-/* Role Badge Colors */
 .role-super-admin {
-  background: rgba(220, 53, 69, 0.1);
-  color: var(--apex-danger);
-  border: 1px solid rgba(220, 53, 69, 0.2);
+  background: #dc3545;
+  color: white;
 }
 
 .role-manager {
-  background: rgba(0, 102, 204, 0.1);
-  color: var(--apex-primary);
-  border: 1px solid rgba(0, 102, 204, 0.2);
+  background: #28a745;
+  color: white;
 }
 
 .role-hr-admin {
-  background: rgba(255, 102, 0, 0.1);
-  color: var(--apex-accent);
-  border: 1px solid rgba(255, 102, 0, 0.2);
+  background: #ffc107;
+  color: #333;
 }
 
 .role-employee {
-  background: rgba(40, 167, 69, 0.1);
-  color: var(--apex-success);
-  border: 1px solid rgba(40, 167, 69, 0.2);
+  background: #6c757d;
+  color: white;
 }
 
-.role-viewer {
-  background: rgba(108, 117, 125, 0.1);
-  color: var(--apex-text-secondary);
-  border: 1px solid rgba(108, 117, 125, 0.2);
+.role-default {
+  background: #e9ecef;
+  color: #333;
+}
+
+.permission-count {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+/* Department */
+.department {
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.no-department {
+  color: #999;
+  font-style: italic;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+}
+
+.status-active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-suspended {
+  background: #fff3cd;
+  color: #856404;
+}
+
+/* Dates */
+.last-login, .created-date {
+  color: #666;
+  font-size: 0.85rem;
 }
 
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
 }
 
-.view-btn {
-  background: rgba(23, 162, 184, 0.1);
-  color: var(--apex-info);
-}
-
-.view-btn:hover {
-  background: var(--apex-info);
-  color: white;
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .edit-btn {
-  background: rgba(255, 193, 7, 0.1);
-  color: var(--apex-warning);
+  background: #e6f3ff;
+  color: #0066cc;
 }
 
-.edit-btn:hover {
-  background: var(--apex-warning);
+.edit-btn:hover:not(:disabled) {
+  background: #0066cc;
   color: white;
+  transform: translateY(-1px);
 }
 
-.reset-btn {
-  background: rgba(0, 102, 204, 0.1);
-  color: var(--apex-primary);
+.toggle-btn.activate-btn {
+  background: #d4edda;
+  color: #155724;
 }
 
-.reset-btn:hover {
-  background: var(--apex-primary);
+.toggle-btn.activate-btn:hover:not(:disabled) {
+  background: #28a745;
   color: white;
+  transform: translateY(-1px);
+}
+
+.toggle-btn.deactivate-btn {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.toggle-btn.deactivate-btn:hover:not(:disabled) {
+  background: #ffc107;
+  color: #333;
+  transform: translateY(-1px);
 }
 
 .delete-btn {
-  background: rgba(220, 53, 69, 0.1);
-  color: var(--apex-danger);
+  background: #f8d7da;
+  color: #721c24;
 }
 
-.delete-btn:hover {
-  background: var(--apex-danger);
+.delete-btn:hover:not(:disabled) {
+  background: #dc3545;
   color: white;
+  transform: translateY(-1px);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 16px;
+}
+
+.pagination-btn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #0066cc;
+  color: white;
+  border-color: #0066cc;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 0.9rem;
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
-  color: var(--apex-text-secondary);
+  padding: 48px 24px;
+  color: #666;
 }
 
 .empty-icon {
   font-size: 4rem;
-  color: var(--apex-border);
-  margin-bottom: 1rem;
+  color: #ccc;
+  margin-bottom: 16px;
 }
 
 .empty-state h3 {
-  margin: 0 0 0.5rem 0;
-  color: var(--apex-text);
+  color: #333;
+  margin: 0 0 8px 0;
 }
 
 .empty-state p {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 24px 0;
+}
+
+/* Card Actions */
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #0066cc;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.results-info {
+  color: #666;
+  font-size: 0.9rem;
 }
 
 /* Modal Styles */
@@ -360,7 +512,7 @@
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .detail-grid {
     grid-template-columns: 1fr;
   }
@@ -369,36 +521,31 @@
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
+    gap: 16px;
+    align-items: stretch;
   }
 
   .filters-grid {
     grid-template-columns: 1fr;
   }
 
-  .modal-container {
-    width: 95%;
-    margin: 1rem;
-  }
-
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    padding: 1rem;
-  }
-
-  .apex-table {
+  .table-responsive {
     font-size: 0.8rem;
   }
 
   .apex-table th,
   .apex-table td {
-    padding: 0.5rem;
+    padding: 12px 8px;
+  }
+
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
   .action-buttons {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 4px;
   }
 }

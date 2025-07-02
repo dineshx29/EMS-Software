@@ -13,10 +13,10 @@
   align-items: center;
   background: var(--apex-surface);
   border: 1px solid var(--apex-border);
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .page-title h1 {
@@ -46,6 +46,415 @@
 .filter-group {
   display: flex;
   flex-direction: column;
+}
+
+/* Table Enhancements */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--apex-border);
+}
+
+.apex-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th {
+    background: var(--apex-header-bg, #f8f9fa);
+    color: var(--apex-header-text, #495057);
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--apex-border);
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--apex-border);
+    vertical-align: middle;
+  }
+
+  tr:hover {
+    background: var(--apex-hover-bg, rgba(0, 123, 255, 0.05));
+  }
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.view-btn {
+    background: var(--apex-info-bg, #e3f2fd);
+    color: var(--apex-info, #0277bd);
+
+    &:hover {
+      background: var(--apex-info-hover-bg, #bbdefb);
+    }
+  }
+
+  &.edit-btn {
+    background: var(--apex-warning-bg, #fff3e0);
+    color: var(--apex-warning, #f57c00);
+
+    &:hover {
+      background: var(--apex-warning-hover-bg, #ffe0b2);
+    }
+  }
+
+  &.delete-btn {
+    background: var(--apex-danger-bg, #ffebee);
+    color: var(--apex-danger, #d32f2f);
+
+    &:hover {
+      background: var(--apex-danger-hover-bg, #ffcdd2);
+    }
+  }
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.status-active {
+    background: var(--apex-success-bg, #e8f5e8);
+    color: var(--apex-success, #2e7d32);
+  }
+
+  &.status-inactive {
+    background: var(--apex-secondary-bg, #f5f5f5);
+    color: var(--apex-secondary, #757575);
+  }
+
+  &.status-on-leave {
+    background: var(--apex-warning-bg, #fff3e0);
+    color: var(--apex-warning, #f57c00);
+  }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--apex-text-secondary);
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0 0 1.5rem 0;
+    font-size: 0.9rem;
+  }
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-top: 1px solid var(--apex-border);
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--apex-border);
+  background: var(--apex-surface);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--apex-primary);
+    color: white;
+    border-color: var(--apex-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--apex-text-secondary);
+}
+
+/* Large Modal */
+.large-modal {
+  max-width: 1000px;
+  width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  .modal-body {
+    max-height: calc(90vh - 140px);
+    overflow-y: auto;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+
+      &:hover {
+        background: #a8a8a8;
+      }
+    }
+  }
+}
+
+/* Employee Form Sections */
+.employee-form {
+  .form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--apex-border);
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      margin: 0 0 1.5rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--apex-text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--apex-primary);
+    }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+/* Employee Details View */
+.employee-details {
+  .detail-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--apex-border);
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    h3 {
+      margin: 0 0 1.5rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--apex-text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--apex-primary);
+    }
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-weight: 600;
+      color: var(--apex-text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    span {
+      color: var(--apex-text);
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+  }
+
+  .notes-content {
+    margin: 0;
+    padding: 1rem;
+    background: var(--apex-surface-variant, #f8f9fa);
+    border-radius: 8px;
+    border-left: 4px solid var(--apex-primary);
+    line-height: 1.6;
+    font-style: italic;
+  }
+}
+
+/* Form Enhancements */
+.apex-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .apex-form-label {
+    font-weight: 600;
+    color: var(--apex-text);
+    font-size: 0.9rem;
+
+    &.required::after {
+      content: ' *';
+      color: var(--apex-danger, #d32f2f);
+    }
+  }
+
+  .apex-form-control {
+    padding: 0.75rem;
+    border: 1px solid var(--apex-border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background: var(--apex-surface);
+    color: var(--apex-text);
+
+    &:focus {
+      outline: none;
+      border-color: var(--apex-primary);
+      box-shadow: 0 0 0 3px rgba(var(--apex-primary-rgb), 0.1);
+    }
+
+    &:invalid {
+      border-color: var(--apex-danger, #d32f2f);
+    }
+
+    &::placeholder {
+      color: var(--apex-text-secondary);
+      opacity: 0.7;
+    }
+  }
+
+  textarea.apex-form-control {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .apex-table {
+    font-size: 0.8rem;
+
+    th, td {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .large-modal {
+    width: 95vw;
+    max-width: none;
+    margin: 1rem;
+  }
+
+  .employee-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-details .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .employees-container {
+    padding: 0.5rem;
+  }
+
+  .page-header {
+    padding: 1rem;
+  }
+
+  .apex-table {
+    th, td {
+      padding: 0.5rem 0.25rem;
+    }
+  }
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
 }
 
 /* Table Styles */
@@ -365,7 +774,7 @@
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .detail-grid {
     grid-template-columns: 1fr;
   }

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS API - Employee Management System</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .header { 
+            text-align: center; 
+            color: #2c3e50; 
+            margin-bottom: 30px; 
+        }
+        .status { 
+            background: #2ecc71; 
+            color: white; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 20px 0; 
+            text-align: center; 
+        }
+        .endpoints { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 5px; 
+            margin: 20px 0; 
+        }
+        .endpoint { 
+            background: #fff; 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-left: 4px solid #3498db; 
+            border-radius: 3px; 
+        }
+        .method { 
+            font-weight: bold; 
+            color: #e74c3c; 
+        }
+        .test-section { 
+            margin: 30px 0; 
+            padding: 20px; 
+            background: #ecf0f1; 
+            border-radius: 5px; 
+        }
+        button { 
+            background: #3498db; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { 
+            background: #2980b9; 
+        }
+        .result { 
+            background: #2c3e50; 
+            color: #ecf0f1; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+            font-family: monospace; 
+            white-space: pre-wrap; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Employee Management System API</h1>
+            <p>Full-Stack EMS with CodeIgniter 4 Backend & Angular Frontend</p>
+        </div>
+
+        <div class="status">
+            ✅ API Server is Running on XAMPP
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 API Testing</h3>
+            <button onclick="testAPI()">Test API Health</button>
+            <button onclick="testDatabase()">Test Database Connection</button>
+            <button onclick="testLogin()">Test Login</button>
+            <div id="result"></div>
+        </div>
+
+        <div class="endpoints">
+            <h3>📡 Available API Endpoints</h3>
+            
+            <h4>Authentication</h4>
+            <div class="endpoint"><span class="method">POST</span> /api/auth/login</div>
+            <div class="endpoint"><span class="method">POST</span> /api/auth/register</div>
+            <div class="endpoint"><span class="method">GET</span> /api/auth/profile</div>
+            <div class="endpoint"><span class="method">PUT</span> /api/auth/profile</div>
+
+            <h4>Dashboard</h4>
+            <div class="endpoint"><span class="method">GET</span> /api/dashboard</div>
+            <div class="endpoint"><span class="method">GET</span> /api/dashboard/user</div>
+            <div class="endpoint"><span class="method">GET</span> /api/dashboard/analytics</div>
+
+            <h4>Employees</h4>
+            <div class="endpoint"><span class="method">GET</span> /api/employees</div>
+            <div class="endpoint"><span class="method">POST</span> /api/employees</div>
+            <div class="endpoint"><span class="method">GET</span> /api/employees/{id}</div>
+            <div class="endpoint"><span class="method">PUT</span> /api/employees/{id}</div>
+            <div class="endpoint"><span class="method">DELETE</span> /api/employees/{id}</div>
+
+            <h4>Departments</h4>
+            <div class="endpoint"><span class="method">GET</span> /api/departments</div>
+            <div class="endpoint"><span class="method">POST</span> /api/departments</div>
+            <div class="endpoint"><span class="method">GET</span> /api/departments/{id}</div>
+            <div class="endpoint"><span class="method">PUT</span> /api/departments/{id}</div>
+            <div class="endpoint"><span class="method">DELETE</span> /api/departments/{id}</div>
+
+            <h4>Users</h4>
+            <div class="endpoint"><span class="method">GET</span> /api/users</div>
+            <div class="endpoint"><span class="method">POST</span> /api/users</div>
+            <div class="endpoint"><span class="method">GET</span> /api/users/{id}</div>
+            <div class="endpoint"><span class="method">PUT</span> /api/users/{id}</div>
+            <div class="endpoint"><span class="method">DELETE</span> /api/users/{id}</div>
+
+            <h4>Roles & Permissions</h4>
+            <div class="endpoint"><span class="method">GET</span> /api/roles</div>
+            <div class="endpoint"><span class="method">GET</span> /api/permissions</div>
+            <div class="endpoint"><span class="method">POST</span> /api/roles</div>
+            <div class="endpoint"><span class="method">PUT</span> /api/roles/{id}/permissions</div>
+
+            <h4>Notifications</h4>
+            <div class="endpoint"><span class="method">GET</span> /api/notifications</div>
+            <div class="endpoint"><span class="method">POST</span> /api/notifications</div>
+            <div class="endpoint"><span class="method">PUT</span> /api/notifications/{id}/read</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 Default Test Accounts</h3>
+            <p><strong>Super Admin:</strong> admin / admin123</p>
+            <p><strong>HR Manager:</strong> hrmanager / hr123</p>
+            <p><strong>Department Manager:</strong> deptmanager / dept123</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Technical Details</h3>
+            <p><strong>Backend:</strong> CodeIgniter 4 + PHP</p>
+            <p><strong>Database:</strong> MySQL (ems_datas)</p>
+            <p><strong>Frontend:</strong> Angular with Oracle APEX Theme</p>
+            <p><strong>Authentication:</strong> JWT Tokens</p>
+            <p><strong>Server:</strong> XAMPP Apache</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/Projects/Project/backend/ems-api/public';
+        
+        function showResult(data) {
+            document.getElementById('result').innerHTML = '<div class="result">' + JSON.stringify(data, null, 2) + '</div>';
+        }
+
+        async function testAPI() {
+            try {
+                const response = await fetch(API_BASE + '/api');
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({error: error.message});
+            }
+        }
+
+        async function testDatabase() {
+            try {
+                const response = await fetch(API_BASE + '/api/test');
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({error: error.message});
+            }
+        }
+
+        async function testLogin() {
+            try {
+                const response = await fetch(API_BASE + '/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+                const data = await response.json();
+                showResult(data);
+            } catch (error) {
+                showResult({error: error.message});
+            }
+        }
+    </script>
+</body>
+</html>

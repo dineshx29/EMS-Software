@@ -1,4 +1,19 @@
+// Import modal and form styles
+@use '../shared/styles/modal-forms.scss';
+
 // App Component Specific Styles
+.apex-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.auth-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .apex-nav-header {
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: white;

@@ -1,183 +1,558 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import { NotificationService } from '../../services/notification.service';
+
+// Custom password match validator
+function passwordMatchValidator(control: AbstractControl): { [key: string]: boolean } | null {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirmPassword');
+
+  if (!password || !confirmPassword) {
+    return null;
+  }
+
+  return password.value === confirmPassword.value ? null : { 'passwordMismatch': true };
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  department?: string;
+  roleId: number;
+  roleName: string;
+  status: 'Active' | 'Inactive' | 'Suspended';
+  lastLogin: Date | null;
+  createdDate: Date;
+  notes?: string;
+}
+
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+  permissions: string[];
+}
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss'
 })
 export class UsersComponent implements OnInit {
-  
-  users = [
-    {
-      id: 1,
-      username: 'admin',
-      email: 'admin@apexems.com',
-      firstName: 'System',
-      lastName: 'Administrator',
-      role: 'Super Admin',
-      status: 'Active',
-      lastLogin: '2024-07-01T08:30:00',
-      createdDate: '2024-01-01T00:00:00'
-    },
-    {
-      id: 2,
-      username: 'jsmith',
-      email: 'john.smith@company.com',
-      firstName: 'John',
-      lastName: 'Smith',
-      role: 'Manager',
-      status: 'Active',
-      lastLogin: '2024-06-30T16:45:00',
-      createdDate: '2024-02-15T00:00:00'
-    },
-    {
-      id: 3,
-      username: 'sjohnson',
-      email: 'sarah.johnson@company.com',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      role: 'HR Admin',
-      status: 'Active',
-      lastLogin: '2024-06-30T14:20:00',
-      createdDate: '2024-03-10T00:00:00'
-    }
-  ];
+  private fb = inject(FormBuilder);
+  private notificationService = inject(NotificationService);
 
-  filteredUsers = [...this.users];
+  // Data properties
+  users: User[] = [];
+  roles: Role[] = [];
+  departments: string[] = [];
+
+  // UI state
+  showAddModal = false;
+  isEditing = false;
+  isLoading = false;
+  currentUser: User | null = null;
+
+  // Form
+  userForm!: FormGroup;
+
+  // Search and filtering
   searchTerm = '';
   selectedRole = '';
   selectedStatus = '';
 
-  roles = ['Super Admin', 'Manager', 'HR Admin', 'Employee', 'Viewer'];
-  statuses = ['Active', 'Inactive', 'Suspended'];
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  totalPages = 0;
+  paginatedUsers: User[] = [];
 
-  showModal = false;
-  modalMode: 'add' | 'edit' | 'view' = 'add';
-  selectedUser: any = {};
+  // Utility property for template
+  Math = Math;
 
-  constructor() { }
+  constructor() {
+    this.initializeForm();
+  }
 
   ngOnInit(): void {
-    this.applyFilters();
+    this.loadMockData();
+    this.updatePagination();
   }
 
-  applyFilters(): void {
-    this.filteredUsers = this.users.filter(user => {
-      const matchesSearch = !this.searchTerm || 
-        user.username.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        `${user.firstName} ${user.lastName}`.toLowerCase().includes(this.searchTerm.toLowerCase());
-
-      const matchesRole = !this.selectedRole || user.role === this.selectedRole;
-      const matchesStatus = !this.selectedStatus || user.status === this.selectedStatus;
-
-      return matchesSearch && matchesRole && matchesStatus;
-    });
+  private initializeForm(): void {
+    this.userForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      phone: [''],
+      department: [''],
+      password: ['', [Validators.minLength(8), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)]],
+      confirmPassword: [''],
+      roleId: ['', Validators.required],
+      status: ['Active', Validators.required],
+      notes: ['']
+    }, { validators: passwordMatchValidator });
   }
 
+  private loadMockData(): void {
+    // Mock roles data
+    this.roles = [
+      {
+        id: 1,
+        name: 'Super Admin',
+        description: 'Full system access',
+        permissions: ['all', 'users.manage', 'employees.manage', 'roles.manage', 'settings.manage']
+      },
+      {
+        id: 2,
+        name: 'Manager',
+        description: 'Department management',
+        permissions: ['employees.read', 'employees.write', 'reports.read']
+      },
+      {
+        id: 3,
+        name: 'HR Admin',
+        description: 'Human resources administration',
+        permissions: ['employees.read', 'employees.write', 'users.read']
+      },
+      {
+        id: 4,
+        name: 'Employee',
+        description: 'Basic employee access',
+        permissions: ['dashboard.read', 'profile.read', 'profile.write']
+      }
+    ];
+
+    // Mock departments data
+    this.departments = [
+      'Information Technology',
+      'Human Resources',
+      'Finance',
+      'Marketing',
+      'Sales',
+      'Operations',
+      'Legal',
+      'Customer Service'
+    ];
+
+    // Mock users data
+    this.users = [
+      {
+        id: 1,
+        username: 'admin',
+        email: 'admin@company.com',
+        firstName: 'System',
+        lastName: 'Administrator',
+        phone: '+1 (555) 123-4567',
+        department: 'Information Technology',
+        roleId: 1,
+        roleName: 'Super Admin',
+        status: 'Active',
+        lastLogin: new Date('2024-01-15T10:30:00'),
+        createdDate: new Date('2024-01-01T09:00:00'),
+        notes: 'System administrator account'
+      },
+      {
+        id: 2,
+        username: 'jsmith',
+        email: 'john.smith@company.com',
+        firstName: 'John',
+        lastName: 'Smith',
+        phone: '+1 (555) 234-5678',
+        department: 'Human Resources',
+        roleId: 3,
+        roleName: 'HR Admin',
+        status: 'Active',
+        lastLogin: new Date('2024-01-14T14:15:00'),
+        createdDate: new Date('2024-01-05T11:00:00')
+      },
+      {
+        id: 3,
+        username: 'mjohnson',
+        email: 'mary.johnson@company.com',
+        firstName: 'Mary',
+        lastName: 'Johnson',
+        phone: '+1 (555) 345-6789',
+        department: 'Finance',
+        roleId: 2,
+        roleName: 'Manager',
+        status: 'Active',
+        lastLogin: new Date('2024-01-13T16:45:00'),
+        createdDate: new Date('2024-01-08T13:30:00')
+      },
+      {
+        id: 4,
+        username: 'bwilson',
+        email: 'bob.wilson@company.com',
+        firstName: 'Bob',
+        lastName: 'Wilson',
+        department: 'Sales',
+        roleId: 4,
+        roleName: 'Employee',
+        status: 'Inactive',
+        lastLogin: new Date('2024-01-10T09:20:00'),
+        createdDate: new Date('2024-01-12T15:00:00')
+      },
+      {
+        id: 5,
+        username: 'sdavis',
+        email: 'sarah.davis@company.com',
+        firstName: 'Sarah',
+        lastName: 'Davis',
+        phone: '+1 (555) 456-7890',
+        department: 'Marketing',
+        roleId: 4,
+        roleName: 'Employee',
+        status: 'Active',
+        lastLogin: new Date('2024-01-15T11:00:00'),
+        createdDate: new Date('2024-01-10T10:15:00')
+      }
+    ];
+
+    this.totalItems = this.users.length;
+    this.filterUsers();
+  }
+
+  // Search and filtering methods
   onSearchChange(): void {
-    this.applyFilters();
+    this.currentPage = 1;
+    this.filterUsers();
   }
 
   onRoleChange(): void {
-    this.applyFilters();
+    this.currentPage = 1;
+    this.filterUsers();
   }
 
   onStatusChange(): void {
-    this.applyFilters();
+    this.currentPage = 1;
+    this.filterUsers();
   }
 
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedRole = '';
+    this.selectedStatus = '';
+    this.currentPage = 1;
+    this.filterUsers();
+  }
+
+  private filterUsers(): void {
+    let filtered = [...this.users];
+
+    // Apply search filter
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(user =>
+        user.firstName.toLowerCase().includes(term) ||
+        user.lastName.toLowerCase().includes(term) ||
+        user.username.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term)
+      );
+    }
+
+    // Apply role filter
+    if (this.selectedRole) {
+      filtered = filtered.filter(user => user.roleName === this.selectedRole);
+    }
+
+    // Apply status filter
+    if (this.selectedStatus) {
+      filtered = filtered.filter(user => user.status === this.selectedStatus);
+    }
+
+    this.totalItems = filtered.length;
+    this.updatePagination();
+
+    // Apply pagination
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedUsers = filtered.slice(startIndex, endIndex);
+  }
+
+  private updatePagination(): void {
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = Math.max(1, this.totalPages);
+    }
+  }
+
+  // Pagination methods
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.filterUsers();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.filterUsers();
+    }
+  }
+
+  // Modal methods
   addUser(): void {
-    this.modalMode = 'add';
-    this.selectedUser = {
-      username: '',
-      email: '',
-      firstName: '',
-      lastName: '',
-      role: 'Employee',
-      status: 'Active',
-      password: ''
-    };
-    this.showModal = true;
+    this.isEditing = false;
+    this.currentUser = null;
+    this.resetForm();
+    this.showAddModal = true;
+
+    // Set password validation for new users
+    this.userForm.get('password')?.setValidators([
+      Validators.required,
+      Validators.minLength(8),
+      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    ]);
+    this.userForm.get('confirmPassword')?.setValidators([Validators.required]);
+    this.userForm.updateValueAndValidity();
   }
 
-  editUser(user: any): void {
-    this.modalMode = 'edit';
-    this.selectedUser = { ...user };
-    this.showModal = true;
-  }
+  editUser(user: User): void {
+    this.isEditing = true;
+    this.currentUser = user;
+    this.populateForm(user);
+    this.showAddModal = true;
 
-  viewUser(user: any): void {
-    this.modalMode = 'view';
-    this.selectedUser = { ...user };
-    this.showModal = true;
-  }
-
-  deleteUser(user: any): void {
-    if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
-      const index = this.users.findIndex(u => u.id === user.id);
-      if (index > -1) {
-        this.users.splice(index, 1);
-        this.applyFilters();
-      }
-    }
-  }
-
-  saveUser(): void {
-    if (this.modalMode === 'add') {
-      const newId = Math.max(...this.users.map(u => u.id)) + 1;
-      this.selectedUser.id = newId;
-      this.selectedUser.createdDate = new Date().toISOString();
-      this.selectedUser.lastLogin = null;
-      this.users.push({ ...this.selectedUser });
-    } else if (this.modalMode === 'edit') {
-      const index = this.users.findIndex(u => u.id === this.selectedUser.id);
-      if (index > -1) {
-        this.users[index] = { ...this.selectedUser };
-      }
-    }
-
-    this.closeModal();
-    this.applyFilters();
+    // Remove password validation for editing
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.get('confirmPassword')?.clearValidators();
+    this.userForm.updateValueAndValidity();
   }
 
   closeModal(): void {
-    this.showModal = false;
-    this.selectedUser = {};
+    this.showAddModal = false;
+    this.isEditing = false;
+    this.currentUser = null;
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.userForm.reset({
+      status: 'Active'
+    });
+  }
+
+  private populateForm(user: User): void {
+    this.userForm.patchValue({
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone || '',
+      department: user.department || '',
+      roleId: user.roleId,
+      status: user.status,
+      notes: user.notes || ''
+    });
+  }
+
+  // Form validation helper
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.userForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  // Password strength methods
+  getPasswordStrength(): string {
+    const password = this.userForm.get('password')?.value || '';
+    if (password.length === 0) return '';
+
+    let score = 0;
+
+    // Length check
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+
+    // Character variety checks
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+
+    if (score <= 2) return 'weak';
+    if (score <= 4) return 'fair';
+    if (score <= 5) return 'good';
+    return 'strong';
+  }
+
+  getPasswordStrengthText(): string {
+    const strength = this.getPasswordStrength();
+    switch (strength) {
+      case 'weak': return 'Weak Password';
+      case 'fair': return 'Fair Password';
+      case 'good': return 'Good Password';
+      case 'strong': return 'Strong Password';
+      default: return '';
+    }
+  }
+
+  // Security action methods
+  forcePasswordReset(): void {
+    if (this.currentUser) {
+      this.notificationService.showSuccess('Password reset email sent to ' + this.currentUser.email, 'Password Reset');
+      // In a real app, this would call an API to force password reset
+    }
+  }
+
+  toggleAccountLock(): void {
+    if (this.currentUser) {
+      const action = this.currentUser.status === 'Suspended' ? 'unlocked' : 'locked';
+      this.currentUser.status = this.currentUser.status === 'Suspended' ? 'Active' : 'Suspended';
+      this.notificationService.showSuccess(`Account ${action} successfully`, 'Account Status');
+      // In a real app, this would call an API to lock/unlock the account
+    }
+  }
+
+  // Additional utility properties
+  get selectedUser(): User | null {
+    return this.currentUser;
+  }
+
+  // CRUD operations
+  saveUser(): void {
+    if (this.userForm.valid) {
+      this.isLoading = true;
+
+      // Simulate API call
+      setTimeout(() => {
+        try {
+          const formValue = this.userForm.value;
+
+          if (this.isEditing && this.currentUser) {
+            // Update existing user
+            const userIndex = this.users.findIndex(u => u.id === this.currentUser!.id);
+            if (userIndex !== -1) {
+              const selectedRole = this.roles.find(r => r.id == formValue.roleId);
+              this.users[userIndex] = {
+                ...this.users[userIndex],
+                email: formValue.email,
+                firstName: formValue.firstName,
+                lastName: formValue.lastName,
+                phone: formValue.phone,
+                department: formValue.department,
+                roleId: formValue.roleId,
+                roleName: selectedRole?.name || '',
+                status: formValue.status,
+                notes: formValue.notes
+              };
+
+              this.notificationService.showSuccess('Success', 'User updated successfully');
+            }
+          } else {
+            // Create new user
+            const selectedRole = this.roles.find(r => r.id == formValue.roleId);
+            const newUser: User = {
+              id: Math.max(...this.users.map(u => u.id)) + 1,
+              username: formValue.username,
+              email: formValue.email,
+              firstName: formValue.firstName,
+              lastName: formValue.lastName,
+              phone: formValue.phone,
+              department: formValue.department,
+              roleId: formValue.roleId,
+              roleName: selectedRole?.name || '',
+              status: formValue.status,
+              lastLogin: null,
+              createdDate: new Date(),
+              notes: formValue.notes
+            };
+
+            this.users.push(newUser);
+            this.notificationService.showSuccess('Success', 'User created successfully');
+          }
+
+          this.filterUsers();
+          this.closeModal();
+        } catch (error) {
+          this.notificationService.showError('Error', 'Failed to save user');
+        } finally {
+          this.isLoading = false;
+        }
+      }, 1000);
+    } else {
+      this.notificationService.showWarning('Warning', 'Please fill in all required fields');
+    }
+  }
+
+  toggleUserStatus(user: User): void {
+    const newStatus = user.status === 'Active' ? 'Inactive' : 'Active';
+    const action = newStatus === 'Active' ? 'activated' : 'deactivated';
+
+    if (confirm(`Are you sure you want to ${action === 'activated' ? 'activate' : 'deactivate'} ${user.firstName} ${user.lastName}?`)) {
+      user.status = newStatus;
+      this.notificationService.showSuccess('Success', `User ${action} successfully`);
+      this.filterUsers();
+    }
+  }
+
+  deleteUser(user: User): void {
+    if (user.username === 'admin') {
+      this.notificationService.showError('Error', 'Cannot delete the admin user');
+      return;
+    }
+
+    if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}? This action cannot be undone.`)) {
+      const index = this.users.findIndex(u => u.id === user.id);
+      if (index !== -1) {
+        this.users.splice(index, 1);
+        this.notificationService.showSuccess('Success', 'User deleted successfully');
+        this.filterUsers();
+      }
+    }
+  }
+
+  // Utility methods
+  getRoleClass(roleName: string): string {
+    const roleClasses: { [key: string]: string } = {
+      'Super Admin': 'role-super-admin',
+      'Manager': 'role-manager',
+      'HR Admin': 'role-hr-admin',
+      'Employee': 'role-employee'
+    };
+    return roleClasses[roleName] || 'role-default';
   }
 
   getStatusClass(status: string): string {
-    switch (status.toLowerCase()) {
-      case 'active': return 'status-active';
-      case 'inactive': return 'status-inactive';
-      case 'suspended': return 'status-suspended';
-      default: return 'status-default';
-    }
+    const statusClasses: { [key: string]: string } = {
+      'Active': 'status-active',
+      'Inactive': 'status-inactive',
+      'Suspended': 'status-suspended'
+    };
+    return statusClasses[status] || 'status-default';
   }
 
-  getRoleClass(role: string): string {
-    switch (role.toLowerCase()) {
-      case 'super admin': return 'role-super-admin';
-      case 'manager': return 'role-manager';
-      case 'hr admin': return 'role-hr-admin';
-      case 'employee': return 'role-employee';
-      case 'viewer': return 'role-viewer';
-      default: return 'role-default';
-    }
+  getPermissionCount(user: User): number {
+    const role = this.roles.find(r => r.id === user.roleId);
+    return role?.permissions.length || 0;
   }
 
-  formatDateTime(dateString: string): string {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleString('en-US');
+  getSelectedRolePermissions(): string[] {
+    const roleId = this.userForm.get('roleId')?.value;
+    if (!roleId) return [];
+
+    const role = this.roles.find(r => r.id == roleId);
+    return role?.permissions || [];
   }
 
-  resetPassword(user: any): void {
-    if (confirm(`Reset password for ${user.username}?`)) {
-      alert('Password reset functionality would be implemented here');
-    }
+  formatDate(date: Date | null): string {
+    if (!date) return 'Never';
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 }

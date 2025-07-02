@@ -42,12 +42,20 @@ A comprehensive Oracle APEX-inspired Employee Management System built with Angul
 - Role descriptions and user count tracking
 - Visual role cards with permission tags
 
-#### 6. **Reports & Analytics**
+#### 7. **🔔 Advanced Notification System**
+- **Notification Center**: Dropdown from header with real-time updates
+- **Notification Types**: Success, Warning, Error, Info with color coding
+- **Toast Alerts**: Auto-dismiss with progress bar, queue handling
+- **Actions**: Mark as Read/Unread, Delete, Clear All
+- **Persistence**: Notifications saved in localStorage
+- **Responsive Design**: Mobile-friendly notification interface
+
+#### 8. **Reports & Analytics**
 - Report generation interface
 - Multiple report types (Employee, Performance, Attendance)
 - Export capabilities
 
-#### 7. **System Settings**
+#### 9. **System Settings**
 - Company information management
 - Security settings configuration
 - Appearance and theme customization
@@ -131,6 +139,47 @@ apex-ems-frontend/
 4. **Access Application**
    - Frontend: `http://localhost:4200`
    - Backend API: `http://localhost/Projects/Project/backend`
+
+## 🔔 Advanced Notification System
+
+### Features
+- **Notification Center**: Real-time notification dropdown in the header
+- **Toast Notifications**: Auto-dismissing alerts with progress indicators
+- **Multiple Types**: Success, Warning, Error, Info with distinct styling
+- **Persistent Storage**: Notifications saved in localStorage
+- **Action Support**: Custom actions with callback functions
+- **Queue Management**: Smart toast queuing and positioning
+- **Responsive Design**: Mobile-optimized interface
+
+### Notification Types
+1. **Success**: Confirmation messages (green theme)
+2. **Warning**: Cautionary alerts (yellow theme)
+3. **Error**: Error messages (red theme, no auto-dismiss)
+4. **Info**: Informational updates (blue theme)
+
+### Usage Examples
+```typescript
+// Simple success toast
+notificationService.showSuccess('Success!', 'Data saved successfully');
+
+// Error with no auto-dismiss
+notificationService.showError('Error', 'Failed to save data');
+
+// Notification with action button
+notificationService.showInfo('Update Available', 'Click to learn more', {
+  action: {
+    label: 'Learn More',
+    callback: () => console.log('Action clicked')
+  }
+});
+
+// Add to notification center only
+notificationService.addNotification({
+  type: 'warning',
+  title: 'System Maintenance',
+  message: 'Scheduled maintenance tonight at 2 AM'
+});
+```
 
 ## 🎨 Oracle APEX Design Features
 

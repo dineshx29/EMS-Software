@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,7 +11,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-  
+
+  constructor(private notificationService: NotificationService) {}
+
   // Dashboard statistics
   dashboardStats = [
     {
@@ -143,16 +146,80 @@ export class DashboardComponent implements OnInit {
     ]
   };
 
-  constructor() { }
-
   ngOnInit(): void {
     // Initialize dashboard data
     this.loadDashboardData();
+
+    // Add some demo notifications when dashboard loads
+    this.addDemoNotifications();
   }
 
   loadDashboardData(): void {
     // Simulate loading dashboard data
     console.log('Loading dashboard data...');
+  }
+
+  addDemoNotifications(): void {
+    // Add some sample notifications to demonstrate the notification system
+    setTimeout(() => {
+      this.notificationService.showSuccess(
+        'Dashboard Loaded',
+        'Welcome to the Employee Management System'
+      );
+    }, 1000);
+
+    setTimeout(() => {
+      this.notificationService.addNotification({
+        type: 'info',
+        title: 'System Update',
+        message: 'A new version of the system is available. Please review the changelog.'
+      });
+    }, 2000);
+
+    setTimeout(() => {
+      this.notificationService.addNotification({
+        type: 'warning',
+        title: 'Pending Approvals',
+        message: 'You have 23 employee requests awaiting approval.'
+      });
+    }, 3000);
+  }
+
+  testNotifications(): void {
+    // Test different types of notifications
+    this.notificationService.showSuccess(
+      'Success!',
+      'Operation completed successfully'
+    );
+
+    setTimeout(() => {
+      this.notificationService.showWarning(
+        'Warning',
+        'Please check your input data'
+      );
+    }, 500);
+
+    setTimeout(() => {
+      this.notificationService.showError(
+        'Error',
+        'Failed to save changes. Please try again.'
+      );
+    }, 1000);
+
+    setTimeout(() => {
+      this.notificationService.showInfo(
+        'Information',
+        'New features are now available in the system',
+        {
+          action: {
+            label: 'Learn More',
+            callback: () => {
+              this.notificationService.showSuccess('Action', 'You clicked the action button!');
+            }
+          }
+        }
+      );
+    }, 1500);
   }
 
   getColorClass(color: string): string {

@@ -21,9 +21,9 @@
       <div class="filters-grid">
         <div class="filter-group">
           <label class="apex-form-label">Search</label>
-          <input 
-            type="text" 
-            class="apex-form-control" 
+          <input
+            type="text"
+            class="apex-form-control"
             placeholder="Search by name, email, or employee ID"
             [(ngModel)]="searchTerm"
             (input)="onSearchChange()"
@@ -31,8 +31,8 @@
         </div>
         <div class="filter-group">
           <label class="apex-form-label">Department</label>
-          <select 
-            class="apex-form-control" 
+          <select
+            class="apex-form-control"
             [(ngModel)]="selectedDepartment"
             (change)="onDepartmentChange()"
           >
@@ -42,8 +42,8 @@
         </div>
         <div class="filter-group">
           <label class="apex-form-label">Status</label>
-          <select 
-            class="apex-form-control" 
+          <select
+            class="apex-form-control"
             [(ngModel)]="selectedStatus"
             (change)="onStatusChange()"
           >
@@ -72,6 +72,7 @@
               <th>Position</th>
               <th>Status</th>
               <th>Join Date</th>
+              <th>Salary</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -87,25 +88,26 @@
                   {{ employee.status }}
                 </span>
               </td>
-              <td>{{ formatDate(employee.joinDate) }}</td>
+              <td>{{ formatDate(employee.joinDate || employee.hireDate) }}</td>
+              <td>{{ formatCurrency(employee.salary) }}</td>
               <td>
                 <div class="action-buttons">
-                  <button 
-                    class="action-btn view-btn" 
+                  <button
+                    class="action-btn view-btn"
                     (click)="viewEmployee(employee)"
                     title="View Details"
                   >
                     <i class="pi pi-eye"></i>
                   </button>
-                  <button 
-                    class="action-btn edit-btn" 
+                  <button
+                    class="action-btn edit-btn"
                     (click)="editEmployee(employee)"
                     title="Edit Employee"
                   >
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button 
-                    class="action-btn delete-btn" 
+                  <button
+                    class="action-btn delete-btn"
                     (click)="deleteEmployee(employee)"
                     title="Delete Employee"
                   >
@@ -130,21 +132,21 @@
 
       <!-- Pagination -->
       <div class="pagination" *ngIf="totalPages > 1">
-        <button 
-          class="pagination-btn" 
-          (click)="previousPage()" 
+        <button
+          class="pagination-btn"
+          (click)="previousPage()"
           [disabled]="currentPage === 1"
         >
           <i class="pi pi-chevron-left"></i>
         </button>
-        
+
         <span class="pagination-info">
           Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} total)
         </span>
-        
-        <button 
-          class="pagination-btn" 
-          (click)="nextPage()" 
+
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
           [disabled]="currentPage === totalPages"
         >
           <i class="pi pi-chevron-right"></i>
@@ -156,11 +158,11 @@
 
 <!-- Employee Modal -->
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-  <div class="modal-container" (click)="$event.stopPropagation()">
+  <div class="modal-container extra-large-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>
-        <i class="pi" [ngClass]="modalMode === 'add' ? 'pi-plus' : modalMode === 'edit' ? 'pi-pencil' : 'pi-eye'"></i>
-        {{ modalMode === 'add' ? 'Add Employee' : modalMode === 'edit' ? 'Edit Employee' : 'Employee Details' }}
+        <i class="pi" [ngClass]="viewMode ? 'pi-eye' : (isEditing ? 'pi-pencil' : 'pi-user-plus')"></i>
+        {{ viewMode ? 'Employee Details' : (isEditing ? 'Edit Employee' : 'Add New Employee') }}
       </h2>
       <button class="modal-close" (click)="closeModal()">
         <i class="pi pi-times"></i>
@@ -168,181 +170,453 @@
     </div>
 
     <div class="modal-body">
-      <form *ngIf="modalMode !== 'view'">
-        <div class="form-grid">
-          <div class="apex-form-group">
-            <label class="apex-form-label">First Name *</label>
-            <input 
-              type="text" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.firstName"
-              name="firstName"
-              required
-            >
+      <!-- Add/Edit Form -->
+      <form *ngIf="!viewMode" [formGroup]="employeeForm" class="employee-form">
+        <!-- Form Progress Indicator -->
+        <div class="form-progress">
+          <div class="progress-steps">
+            <div class="progress-step active">
+              <div class="step-number">1</div>
+              <span>Personal</span>
+            </div>
+            <div class="progress-step">
+              <div class="step-number">2</div>
+              <span>Employment</span>
+            </div>
+            <div class="progress-step">
+              <div class="step-number">3</div>
+              <span>Contact</span>
+            </div>
           </div>
-          
-          <div class="apex-form-group">
-            <label class="apex-form-label">Last Name *</label>
-            <input 
-              type="text" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.lastName"
-              name="lastName"
-              required
-            >
-          </div>
+        </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Email *</label>
-            <input 
-              type="email" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.email"
-              name="email"
-              required
-            >
-          </div>
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3><i class="pi pi-user"></i> Personal Information</h3>
+          <div class="form-grid two-column">
+            <div class="form-group">
+              <label class="form-label required">First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="firstName"
+                [class.is-invalid]="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched"
+                placeholder="Enter first name"
+              >
+              <div class="invalid-feedback" *ngIf="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
+                First name is required
+              </div>
+            </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Phone</label>
-            <input 
-              type="tel" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.phone"
-              name="phone"
-            >
-          </div>
+            <div class="form-group">
+              <label class="form-label required">Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="lastName"
+                [class.is-invalid]="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched"
+                placeholder="Enter last name"
+              >
+              <div class="invalid-feedback" *ngIf="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
+                Last name is required
+              </div>
+            </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Department *</label>
-            <select 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.department"
-              name="department"
-              required
-            >
-              <option value="">Select Department</option>
-              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
-            </select>
-          </div>
+            <div class="form-group">
+              <label class="form-label required">Email Address</label>
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+                [class.is-invalid]="employeeForm.get('email')?.invalid && employeeForm.get('email')?.touched"
+                placeholder="john.doe@company.com"
+              >
+              <div class="invalid-feedback" *ngIf="employeeForm.get('email')?.invalid && employeeForm.get('email')?.touched">
+                Valid email is required
+              </div>
+            </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Position *</label>
-            <input 
-              type="text" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.position"
-              name="position"
-              required
-            >
-          </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input
+                type="tel"
+                class="form-control"
+                formControlName="phone"
+                placeholder="+1 (555) 123-4567"
+              >
+            </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Status</label>
-            <select 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.status"
-              name="status"
-            >
-              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
-            </select>
-          </div>
+            <div class="form-group">
+              <label class="form-label">Date of Birth</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="dateOfBirth"
+              >
+            </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Join Date *</label>
-            <input 
-              type="date" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.joinDate"
-              name="joinDate"
-              required
-            >
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <select class="form-control" formControlName="gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
           </div>
+        </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Salary</label>
-            <input 
-              type="number" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.salary"
-              name="salary"
-              min="0"
-              step="1000"
-            >
+        <!-- Employment Information Section -->
+        <div class="form-section">
+          <h3><i class="pi pi-briefcase"></i> Employment Information</h3>
+          <div class="form-grid two-column">
+            <div class="form-group">
+              <label class="form-label required">Department</label>
+              <select
+                class="form-control"
+                formControlName="department"
+                [class.is-invalid]="employeeForm.get('department')?.invalid && employeeForm.get('department')?.touched"
+              >
+                <option value="">Select Department</option>
+                <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="employeeForm.get('department')?.invalid && employeeForm.get('department')?.touched">
+                Department is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required">Position/Title</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="position"
+                [class.is-invalid]="employeeForm.get('position')?.invalid && employeeForm.get('position')?.touched"
+                placeholder="e.g., Senior Software Developer"
+              >
+              <div class="invalid-feedback" *ngIf="employeeForm.get('position')?.invalid && employeeForm.get('position')?.touched">
+                Position is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Reporting Manager</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="manager"
+                placeholder="Manager's full name"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label required">Hire Date</label>
+              <input
+                type="date"
+                class="form-control"
+                formControlName="hireDate"
+                [class.is-invalid]="employeeForm.get('hireDate')?.invalid && employeeForm.get('hireDate')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="employeeForm.get('hireDate')?.invalid && employeeForm.get('hireDate')?.touched">
+                Hire date is required
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Employment Type</label>
+              <select class="form-control" formControlName="employmentType">
+                <option value="">Select Employment Type</option>
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Temporary">Temporary</option>
+                <option value="Intern">Intern</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Employment Status</label>
+              <select class="form-control" formControlName="status">
+                <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Annual Salary (USD)</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="salary"
+                min="0"
+                step="1000"
+                placeholder="75000"
+              >
+            </div>
           </div>
+        </div>
 
-          <div class="apex-form-group">
-            <label class="apex-form-label">Manager</label>
-            <input 
-              type="text" 
-              class="apex-form-control" 
-              [(ngModel)]="selectedEmployee.manager"
-              name="manager"
-            >
+        <!-- Address Information Section -->
+        <div class="form-section">
+          <h3><i class="pi pi-map-marker"></i> Address Information</h3>
+          <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">Street Address</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="streetAddress"
+                placeholder="123 Main Street"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="city"
+                placeholder="New York"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">State/Province</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="state"
+                placeholder="NY"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ZIP/Postal Code</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="zipCode"
+                placeholder="10001"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Country</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="country"
+                placeholder="United States"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Contact Section -->
+        <div class="form-section">
+          <h3><i class="pi pi-phone"></i> Emergency Contact</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Contact Name</label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="emergencyContactName"
+                placeholder="Jane Doe"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Contact Phone</label>
+              <input
+                type="tel"
+                class="form-control"
+                formControlName="emergencyContactPhone"
+                placeholder="+1 (555) 987-6543"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Relationship</label>
+              <select class="form-control" formControlName="emergencyContactRelationship">
+                <option value="">Select Relationship</option>
+                <option value="Spouse">Spouse</option>
+                <option value="Parent">Parent</option>
+                <option value="Sibling">Sibling</option>
+                <option value="Child">Child</option>
+                <option value="Friend">Friend</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Notes Section -->
+        <div class="form-section">
+          <h3><i class="pi pi-file-edit"></i> Additional Notes</h3>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea
+              class="form-control"
+              formControlName="notes"
+              rows="4"
+              placeholder="Additional notes about the employee..."
+            ></textarea>
           </div>
         </div>
       </form>
 
       <!-- View Mode -->
-      <div *ngIf="modalMode === 'view'" class="employee-details">
-        <div class="detail-grid">
-          <div class="detail-item">
-            <label>Employee ID:</label>
-            <span>{{ selectedEmployee.employeeId }}</span>
+      <div *ngIf="viewMode" class="employee-details">
+        <!-- Personal Information -->
+        <div class="form-section">
+          <h3><i class="pi pi-user"></i> Personal Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Employee ID:</label>
+              <span>{{ selectedEmployee?.employeeId }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Full Name:</label>
+              <span>{{ selectedEmployee?.firstName }} {{ selectedEmployee?.lastName }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Email:</label>
+              <span>{{ selectedEmployee?.email }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Phone:</label>
+              <span>{{ selectedEmployee?.phone || 'Not provided' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Date of Birth:</label>
+              <span>{{ formatDate(selectedEmployee?.dateOfBirth) }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Gender:</label>
+              <span>{{ selectedEmployee?.gender || 'Not specified' }}</span>
+            </div>
           </div>
-          <div class="detail-item">
-            <label>Full Name:</label>
-            <span>{{ selectedEmployee.firstName }} {{ selectedEmployee.lastName }}</span>
+        </div>
+
+        <!-- Employment Information -->
+        <div class="form-section">
+          <h3><i class="pi pi-briefcase"></i> Employment Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Department:</label>
+              <span>{{ selectedEmployee?.department }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Position:</label>
+              <span>{{ selectedEmployee?.position }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Manager:</label>
+              <span>{{ selectedEmployee?.manager || 'None' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Hire Date:</label>
+              <span>{{ formatDate(selectedEmployee?.hireDate || selectedEmployee?.joinDate) }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Employment Type:</label>
+              <span>{{ selectedEmployee?.employmentType || 'Not specified' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Status:</label>
+              <span class="status-badge" [ngClass]="getStatusClass(selectedEmployee?.status || 'Active')">
+                {{ selectedEmployee?.status }}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Annual Salary:</label>
+              <span>{{ formatCurrency(selectedEmployee?.salary) }}</span>
+            </div>
           </div>
-          <div class="detail-item">
-            <label>Email:</label>
-            <span>{{ selectedEmployee.email }}</span>
+        </div>
+
+        <!-- Address Information -->
+        <div class="form-section" *ngIf="selectedEmployee?.streetAddress || selectedEmployee?.city">
+          <h3><i class="pi pi-map-marker"></i> Address Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item" style="grid-column: 1 / -1;" *ngIf="selectedEmployee?.streetAddress">
+              <label>Street Address:</label>
+              <span>{{ selectedEmployee?.streetAddress }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedEmployee?.city">
+              <label>City:</label>
+              <span>{{ selectedEmployee?.city }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedEmployee?.state">
+              <label>State/Province:</label>
+              <span>{{ selectedEmployee?.state }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedEmployee?.zipCode">
+              <label>ZIP/Postal Code:</label>
+              <span>{{ selectedEmployee?.zipCode }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedEmployee?.country">
+              <label>Country:</label>
+              <span>{{ selectedEmployee?.country }}</span>
+            </div>
           </div>
-          <div class="detail-item">
-            <label>Phone:</label>
-            <span>{{ selectedEmployee.phone }}</span>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="form-section" *ngIf="selectedEmployee?.emergencyContactName">
+          <h3><i class="pi pi-phone"></i> Emergency Contact</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Contact Name:</label>
+              <span>{{ selectedEmployee?.emergencyContactName }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Contact Phone:</label>
+              <span>{{ selectedEmployee?.emergencyContactPhone || 'Not provided' }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Relationship:</label>
+              <span>{{ selectedEmployee?.emergencyContactRelationship || 'Not specified' }}</span>
+            </div>
           </div>
-          <div class="detail-item">
-            <label>Department:</label>
-            <span>{{ selectedEmployee.department }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Position:</label>
-            <span>{{ selectedEmployee.position }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Status:</label>
-            <span class="status-badge" [ngClass]="getStatusClass(selectedEmployee.status)">
-              {{ selectedEmployee.status }}
-            </span>
-          </div>
-          <div class="detail-item">
-            <label>Join Date:</label>
-            <span>{{ formatDate(selectedEmployee.joinDate) }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Salary:</label>
-            <span>{{ formatCurrency(selectedEmployee.salary) }}</span>
-          </div>
-          <div class="detail-item">
-            <label>Manager:</label>
-            <span>{{ selectedEmployee.manager }}</span>
-          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="form-section" *ngIf="selectedEmployee?.notes">
+          <h3><i class="pi pi-file-edit"></i> Additional Notes</h3>
+          <div class="notes-content">{{ selectedEmployee?.notes }}</div>
         </div>
       </div>
     </div>
 
-    <div class="modal-footer">
-      <button class="apex-button apex-button-secondary" (click)="closeModal()">
-        {{ modalMode === 'view' ? 'Close' : 'Cancel' }}
+    <div class="form-actions">
+      <button type="button" class="btn btn-outline" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+        {{ viewMode ? 'Close' : 'Cancel' }}
       </button>
-      <button 
-        *ngIf="modalMode !== 'view'" 
-        class="apex-button apex-button-success" 
-        (click)="saveEmployee()"
+      <button
+        *ngIf="viewMode"
+        type="button"
+        class="btn btn-secondary"
+        (click)="editEmployee(selectedEmployee!)"
       >
-        {{ modalMode === 'add' ? 'Add Employee' : 'Save Changes' }}
+        <i class="pi pi-pencil"></i>
+        Edit Employee
+      </button>
+      <button
+        *ngIf="!viewMode"
+        type="button"
+        class="btn btn-success"
+        (click)="saveEmployee()"
+        [disabled]="employeeForm.invalid || isLoading"
+      >
+        <i class="pi pi-spin pi-spinner" *ngIf="isLoading"></i>
+        <i class="pi pi-check" *ngIf="!isLoading"></i>
+        {{ isEditing ? 'Save Changes' : 'Add Employee' }}
       </button>
     </div>
   </div>
 </div>
+

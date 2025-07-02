@@ -1,0 +1,151 @@
+<div class="apex-two-factor-page">
+  <div class="apex-two-factor-container">
+    <!-- Two-Factor Authentication Region -->
+    <div class="apex-two-factor-region">
+      <!-- Header Section -->
+      <div class="apex-two-factor-header">
+        <div class="apex-logo-container">
+          <div class="apex-logo">
+            <i class="fa fa-shield-alt"></i>
+          </div>
+        </div>
+        <h1 class="apex-page-title">Two-Factor Authentication</h1>
+        <div class="apex-page-subtitle">Enter the verification code to complete your login</div>
+      </div>
+
+      <!-- Two-Factor Form -->
+      <div class="apex-two-factor-body">
+        <div class="apex-two-factor-form-region">
+          <form [formGroup]="twoFactorForm" (ngSubmit)="onSubmit()" class="apex-form">
+            <!-- Verification Code Field -->
+            <div class="apex-item-wrapper">
+              <div class="apex-item-grid apex-item-grid--2">
+                <div class="apex-col apex-col-4">
+                  <label for="P102_CODE" class="apex-item-label">
+                    Verification Code
+                    <span class="apex-item-required" aria-label="(required)">*</span>
+                  </label>
+                </div>
+                <div class="apex-col apex-col-8">
+                  <div class="apex-item-wrapper apex-item-wrapper--verification-code">
+                    <input
+                      type="text"
+                      id="P102_CODE"
+                      formControlName="code"
+                      class="apex-item-text apex-item-verification-code"
+                      placeholder="000000"
+                      maxlength="6"
+                      autocomplete="one-time-code"
+                      (input)="onCodeInput($event)"
+                      [class.apex-item-error-state]="twoFactorForm.get('code')?.invalid && twoFactorForm.get('code')?.touched"
+                    />
+                    <div class="apex-item-help-text">Enter the 6-digit code from your authenticator app</div>
+                  </div>
+
+                  <!-- Validation Messages -->
+                  <div class="apex-item-error" *ngIf="twoFactorForm.get('code')?.invalid && twoFactorForm.get('code')?.touched">
+                    <span class="apex-error-message" *ngIf="twoFactorForm.get('code')?.errors?.['required']">
+                      Verification code is required.
+                    </span>
+                    <span class="apex-error-message" *ngIf="twoFactorForm.get('code')?.errors?.['pattern']">
+                      Please enter a valid 6-digit code.
+                    </span>
+                    <span class="apex-error-message" *ngIf="twoFactorForm.get('code')?.errors?.['invalid']">
+                      Invalid verification code. Please try again.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="apex-item-wrapper">
+              <div class="apex-item-grid apex-item-grid--2">
+                <div class="apex-col apex-col-4"></div>
+                <div class="apex-col apex-col-8">
+                  <div class="apex-button-group">
+                    <button
+                      type="submit"
+                      class="apex-button apex-button--hot"
+                      [disabled]="!twoFactorForm.valid || isLoading"
+                      [class.apex-button--loading]="isLoading"
+                    >
+                      <span class="apex-button-label" *ngIf="!isLoading">
+                        <i class="fa fa-check"></i> Verify Code
+                      </span>
+                      <span class="apex-button-label" *ngIf="isLoading">
+                        <i class="fa fa-spinner fa-spin"></i> Verifying...
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Alternative Actions -->
+            <div class="apex-item-wrapper">
+              <div class="apex-item-grid apex-item-grid--2">
+                <div class="apex-col apex-col-4"></div>
+                <div class="apex-col apex-col-8">
+                  <div class="apex-button-group apex-button-group--secondary">
+                    <button
+                      type="button"
+                      class="apex-button apex-button--link"
+                      [disabled]="!canResend"
+                      (click)="onResendCode()"
+                    >
+                      <span *ngIf="canResend">
+                        <i class="fa fa-refresh"></i> Resend Code
+                      </span>
+                      <span *ngIf="!canResend">
+                        <i class="fa fa-clock-o"></i> Resend in {{ countdown }}s
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="apex-button"
+                      (click)="goBackToLogin()"
+                    >
+                      <i class="fa fa-arrow-left"></i> Back to Login
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Demo Information -->
+        <div class="apex-info-region">
+          <div class="apex-info-header">
+            <h3 class="apex-info-title">
+              <i class="fa fa-info-circle"></i>
+              Demo Verification Code
+            </h3>
+          </div>
+          <div class="apex-info-content">
+            <div class="apex-verification-code-display">
+              <div class="apex-code-label">Use this verification code:</div>
+              <div class="apex-code-value">123456</div>
+              <div class="apex-code-note">For this demo, the verification code is fixed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="apex-two-factor-footer">
+        <div class="apex-footer-content">
+          <div class="apex-security-notice">
+            <i class="fa fa-shield-alt"></i>
+            <span>Your account is protected by two-factor authentication</span>
+          </div>
+          <div class="apex-footer-text">
+            Oracle APEX Employee Management System
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,436 @@
+<div class="users-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1><i class="pi pi-users"></i> User Management</h1>
+      <p>Manage system users, roles, and permissions</p>
+    </div>
+    <div class="page-actions">
+      <button class="apex-button apex-button-success" (click)="addUser()">
+        <i class="pi pi-user-plus"></i> Add User
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="apex-card">
+    <div class="apex-card-header">
+      <i class="pi pi-filter"></i> Filters & Search
+    </div>
+    <div class="apex-card-body">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label class="apex-form-label">Search</label>
+          <input
+            type="text"
+            class="apex-form-control"
+            placeholder="Search by name, username, or email"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          >
+        </div>
+        <div class="filter-group">
+          <label class="apex-form-label">Role</label>
+          <select
+            class="apex-form-control"
+            [(ngModel)]="selectedRole"
+            (change)="onRoleChange()"
+          >
+            <option value="">All Roles</option>
+            <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="apex-form-label">Status</label>
+          <select
+            class="apex-form-control"
+            [(ngModel)]="selectedStatus"
+            (change)="onStatusChange()"
+          >
+            <option value="">All Statuses</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <button class="apex-button apex-button-secondary" (click)="clearFilters()">
+            <i class="pi pi-filter-slash"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="apex-card">
+    <div class="apex-card-header">
+      <div class="card-title">
+        <i class="pi pi-list"></i> Users ({{ totalItems }})
+      </div>
+      <div class="card-actions">
+        <span class="results-info">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, totalItems) }} of {{ totalItems }}
+        </span>
+      </div>
+    </div>
+    <div class="apex-card-body">
+      <div class="table-responsive">
+        <table class="apex-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Contact</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Last Login</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of paginatedUsers">
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">
+                    <i class="pi pi-user"></i>
+                  </div>
+                  <div class="user-details">
+                    <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+                    <div class="user-username">{{ user.username }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="contact-info">
+                  <div class="email">
+                    <i class="pi pi-envelope"></i>
+                    {{ user.email }}
+                  </div>
+                  <div class="phone" *ngIf="user.phone">
+                    <i class="pi pi-phone"></i>
+                    {{ user.phone }}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="role-info">
+                  <span class="role-badge" [ngClass]="getRoleClass(user.roleName)">
+                    {{ user.roleName }}
+                  </span>
+                  <div class="permission-count">{{ getPermissionCount(user) }} permissions</div>
+                </div>
+              </td>
+              <td>
+                <span class="department" *ngIf="user.department">{{ user.department }}</span>
+                <span class="no-department" *ngIf="!user.department">-</span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(user.status)">
+                  <i class="pi pi-check-circle" *ngIf="user.status === 'Active'"></i>
+                  <i class="pi pi-times-circle" *ngIf="user.status === 'Inactive'"></i>
+                  <i class="pi pi-pause-circle" *ngIf="user.status === 'Suspended'"></i>
+                  {{ user.status }}
+                </span>
+              </td>
+              <td>
+                <div class="last-login">
+                  {{ formatDate(user.lastLogin) }}
+                </div>
+              </td>
+              <td>
+                <div class="created-date">
+                  {{ formatDate(user.createdDate) }}
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button
+                    class="action-btn edit-btn"
+                    (click)="editUser(user)"
+                    title="Edit User"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button
+                    class="action-btn toggle-btn"
+                    [ngClass]="{'deactivate-btn': user.status === 'Active', 'activate-btn': user.status !== 'Active'}"
+                    (click)="toggleUserStatus(user)"
+                    [title]="user.status === 'Active' ? 'Deactivate User' : 'Activate User'"
+                  >
+                    <i class="pi pi-pause" *ngIf="user.status === 'Active'"></i>
+                    <i class="pi pi-play" *ngIf="user.status !== 'Active'"></i>
+                  </button>
+                  <button
+                    class="action-btn delete-btn"
+                    (click)="deleteUser(user)"
+                    title="Delete User"
+                    [disabled]="user.username === 'admin'"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <div *ngIf="paginatedUsers.length === 0" class="empty-state">
+          <i class="pi pi-users empty-icon"></i>
+          <h3>No users found</h3>
+          <p>Try adjusting your search criteria or add a new user.</p>
+          <button class="apex-button apex-button-success" (click)="addUser()">
+            <i class="pi pi-user-plus"></i> Add First User
+          </button>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+        >
+          <i class="pi pi-chevron-left"></i>
+        </button>
+
+        <span class="pagination-info">
+          Page {{ currentPage }} of {{ totalPages }} ({{ totalItems }} total)
+        </span>
+
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+        >
+          <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="pi pi-user-plus"></i>
+        {{ isEditing ? 'Edit User' : 'Add New User' }}
+      </h2>
+      <button class="modal-close" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="saveUser()" class="modal-body">
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-user"></i> Basic Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="username"
+              [class.is-invalid]="isFieldInvalid('username')"
+              placeholder="Enter username"
+              [readonly]="isEditing"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('username')">
+              <span *ngIf="userForm.get('username')?.errors?.['required']">Username is required</span>
+              <span *ngIf="userForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              formControlName="email"
+              [class.is-invalid]="isFieldInvalid('email')"
+              placeholder="user@company.com"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+              <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required</span>
+              <span *ngIf="userForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">First Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="firstName"
+              [class.is-invalid]="isFieldInvalid('firstName')"
+              placeholder="Enter first name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('firstName')">
+              <span *ngIf="userForm.get('firstName')?.errors?.['required']">First name is required</span>
+              <span *ngIf="userForm.get('firstName')?.errors?.['minlength']">First name must be at least 2 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Last Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="lastName"
+              [class.is-invalid]="isFieldInvalid('lastName')"
+              placeholder="Enter last name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('lastName')">
+              <span *ngIf="userForm.get('lastName')?.errors?.['required']">Last name is required</span>
+              <span *ngIf="userForm.get('lastName')?.errors?.['minlength']">Last name must be at least 2 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input
+              type="tel"
+              class="form-control"
+              formControlName="phone"
+              placeholder="+1 (555) 123-4567"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select class="form-control" formControlName="department">
+              <option value="">Select Department</option>
+              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Section (only for new users) -->
+      <div class="form-section" *ngIf="!isEditing">
+        <h3><i class="pi pi-lock"></i> Password</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              formControlName="password"
+              [class.is-invalid]="isFieldInvalid('password')"
+              placeholder="Enter password"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
+              <span *ngIf="userForm.get('password')?.errors?.['required']">Password is required</span>
+              <span *ngIf="userForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Confirm Password</label>
+            <input
+              type="password"
+              class="form-control"
+              formControlName="confirmPassword"
+              [class.is-invalid]="isFieldInvalid('confirmPassword')"
+              placeholder="Confirm password"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('confirmPassword')">
+              <span *ngIf="userForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+              <span *ngIf="userForm.get('confirmPassword')?.errors?.['passwordMismatch']">Passwords do not match</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role and Access Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-shield"></i> Role & Access</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">Role</label>
+            <select
+              class="form-control"
+              formControlName="roleId"
+              [class.is-invalid]="isFieldInvalid('roleId')"
+            >
+              <option value="">Select Role</option>
+              <option *ngFor="let role of roles" [value]="role.id">
+                {{ role.name }} - {{ role.description }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('roleId')">
+              Role is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Status</label>
+            <select
+              class="form-control"
+              formControlName="status"
+              [class.is-invalid]="isFieldInvalid('status')"
+            >
+              <option value="">Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('status')">
+              Status is required
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Notes</label>
+            <textarea
+              class="form-control"
+              formControlName="notes"
+              rows="3"
+              placeholder="Additional notes about this user"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Permissions Preview -->
+      <div class="form-section" *ngIf="userForm.get('roleId')?.value">
+        <h3><i class="pi pi-key"></i> Role Permissions</h3>
+        <div class="permissions-preview">
+          <div
+            class="permission-badge"
+            *ngFor="let permission of getSelectedRolePermissions()"
+          >
+            {{ permission }}
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">
+        <i class="pi pi-times"></i> Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!userForm.valid || isLoading"
+        (click)="saveUser()"
+      >
+        <span *ngIf="!isLoading">
+          <i class="pi pi-save"></i>
+          {{ isEditing ? 'Update User' : 'Create User' }}
+        </span>
+        <span *ngIf="isLoading">
+          <i class="pi pi-spin pi-spinner"></i>
+          {{ isEditing ? 'Updating...' : 'Creating...' }}
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

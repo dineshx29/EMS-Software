@@ -1,5 +1,5 @@
 .roles-container {
-  padding: 0;
+  padding: 20px;
   height: 100%;
   overflow-y: auto;
 }
@@ -32,138 +32,139 @@
   font-size: 0.9rem;
 }
 
+/* Roles Grid */
 .roles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
 }
 
+/* Role Card */
 .role-card {
-  background: var(--apex-surface);
-  border: 1px solid var(--apex-border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .role-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #0066cc;
 }
 
+/* Role Header */
 .role-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .role-info h3 {
-  margin: 0 0 0.5rem 0;
-  color: var(--apex-primary);
+  color: #0066cc;
+  margin: 0 0 8px 0;
   font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .role-info p {
+  color: #666;
   margin: 0;
-  color: var(--apex-text-secondary);
   font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .role-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.edit-btn {
-  background: rgba(255, 193, 7, 0.1);
-  color: var(--apex-warning);
-}
-
-.edit-btn:hover {
-  background: var(--apex-warning);
-  color: white;
-}
-
-.delete-btn {
-  background: rgba(220, 53, 69, 0.1);
-  color: var(--apex-danger);
-}
-
-.delete-btn:hover {
-  background: var(--apex-danger);
-  color: white;
-}
-
+/* Role Stats */
 .role-stats {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 1rem 0;
-  border-top: 1px solid var(--apex-border);
-  border-bottom: 1px solid var(--apex-border);
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 16px 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
   font-size: 0.85rem;
-  color: var(--apex-text-secondary);
+  color: #666;
 }
 
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.stat-item i {
+  color: #0066cc;
 }
 
-.status-active {
-  background: rgba(40, 167, 69, 0.1);
-  color: var(--apex-success);
-  border: 1px solid rgba(40, 167, 69, 0.2);
+/* Role Permissions */
+.role-permissions {
+  margin-top: 16px;
 }
 
 .role-permissions h4 {
-  margin: 0 0 0.75rem 0;
-  font-size: 0.9rem;
-  color: var(--apex-text);
+  color: #333;
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .permissions-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .permission-tag {
-  background: rgba(0, 102, 204, 0.1);
-  color: var(--apex-primary);
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  border: 1px solid rgba(0, 102, 204, 0.2);
+  background: #e6f3ff;
+  color: #0066cc;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #cce7ff;
 }
 
+/* Empty State for Roles */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+  background: white;
+  border: 2px dashed #e6e6e6;
+  border-radius: 12px;
+}
+
+/* Status Badge for Roles */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive for Roles */
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -175,13 +176,9 @@
     grid-template-columns: 1fr;
   }
 
-  .role-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .role-stats {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 8px;
+    align-items: flex-start;
   }
 }

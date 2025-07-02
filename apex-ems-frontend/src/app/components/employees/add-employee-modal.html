@@ -1,0 +1,347 @@
+<!-- Add/Edit Employee Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="pi pi-user-plus"></i>
+        {{ isEditing ? 'Edit Employee' : 'Add New Employee' }}
+      </h2>
+      <button class="modal-close" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()" class="modal-body">
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-user"></i> Personal Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">First Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="firstName"
+              [class.is-invalid]="isFieldInvalid('firstName')"
+              placeholder="Enter first name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('firstName')">
+              First name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Last Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="lastName"
+              [class.is-invalid]="isFieldInvalid('lastName')"
+              placeholder="Enter last name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('lastName')">
+              Last name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              formControlName="email"
+              [class.is-invalid]="isFieldInvalid('email')"
+              placeholder="employee@company.com"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+              <span *ngIf="employeeForm.get('email')?.errors?.['required']">Email is required</span>
+              <span *ngIf="employeeForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input
+              type="tel"
+              class="form-control"
+              formControlName="phone"
+              placeholder="+1 (555) 123-4567"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="dateOfBirth"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select class="form-control" formControlName="gender">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employment Information Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-briefcase"></i> Employment Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">Employee ID</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="employeeId"
+              [class.is-invalid]="isFieldInvalid('employeeId')"
+              placeholder="EMP001"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('employeeId')">
+              Employee ID is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Department</label>
+            <select
+              class="form-control"
+              formControlName="department"
+              [class.is-invalid]="isFieldInvalid('department')"
+            >
+              <option value="">Select Department</option>
+              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('department')">
+              Department is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Position</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="position"
+              [class.is-invalid]="isFieldInvalid('position')"
+              placeholder="Software Engineer"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('position')">
+              Position is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Manager</label>
+            <select class="form-control" formControlName="managerId">
+              <option value="">Select Manager</option>
+              <option *ngFor="let manager of managers" [value]="manager.id">
+                {{ manager.firstName }} {{ manager.lastName }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Hire Date</label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="hireDate"
+              [class.is-invalid]="isFieldInvalid('hireDate')"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('hireDate')">
+              Hire date is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Employment Type</label>
+            <select
+              class="form-control"
+              formControlName="employmentType"
+              [class.is-invalid]="isFieldInvalid('employmentType')"
+            >
+              <option value="">Select Type</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Temporary">Temporary</option>
+              <option value="Intern">Intern</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('employmentType')">
+              Employment type is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Salary</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="salary"
+              placeholder="65000"
+              min="0"
+              step="1000"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Status</label>
+            <select
+              class="form-control"
+              formControlName="status"
+              [class.is-invalid]="isFieldInvalid('status')"
+            >
+              <option value="">Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Terminated">Terminated</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('status')">
+              Status is required
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Information Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-map-marker"></i> Address Information</h3>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Street Address</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="streetAddress"
+              placeholder="123 Main Street"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="city"
+              placeholder="New York"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">State/Province</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="state"
+              placeholder="NY"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ZIP/Postal Code</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="zipCode"
+              placeholder="10001"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <select class="form-control" formControlName="country">
+              <option value="">Select Country</option>
+              <option value="United States">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Australia">Australia</option>
+              <option value="Germany">Germany</option>
+              <option value="France">France</option>
+              <option value="India">India</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-info-circle"></i> Additional Information</h3>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Notes</label>
+            <textarea
+              class="form-control"
+              formControlName="notes"
+              rows="3"
+              placeholder="Additional notes about the employee..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Emergency Contact Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="emergencyContactName"
+              placeholder="John Doe"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Emergency Contact Phone</label>
+            <input
+              type="tel"
+              class="form-control"
+              formControlName="emergencyContactPhone"
+              placeholder="+1 (555) 987-6543"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Emergency Contact Relationship</label>
+            <select class="form-control" formControlName="emergencyContactRelationship">
+              <option value="">Select Relationship</option>
+              <option value="Spouse">Spouse</option>
+              <option value="Parent">Parent</option>
+              <option value="Sibling">Sibling</option>
+              <option value="Child">Child</option>
+              <option value="Friend">Friend</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">
+        <i class="pi pi-times"></i> Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!employeeForm.valid || isLoading"
+        (click)="saveEmployee()"
+      >
+        <span *ngIf="!isLoading">
+          <i class="pi pi-save"></i>
+          {{ isEditing ? 'Update Employee' : 'Create Employee' }}
+        </span>
+        <span *ngIf="isLoading">
+          <i class="pi pi-spin pi-spinner"></i>
+          {{ isEditing ? 'Updating...' : 'Creating...' }}
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

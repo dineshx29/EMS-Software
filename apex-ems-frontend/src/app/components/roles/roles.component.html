@@ -24,12 +24,17 @@
           <button class="action-btn edit-btn" (click)="editRole(role)" title="Edit Role">
             <i class="pi pi-pencil"></i>
           </button>
-          <button class="action-btn delete-btn" (click)="deleteRole(role)" title="Delete Role">
+          <button
+            class="action-btn delete-btn"
+            (click)="deleteRole(role)"
+            title="Delete Role"
+            [disabled]="role.name === 'Super Admin'"
+          >
             <i class="pi pi-trash"></i>
           </button>
         </div>
       </div>
-      
+
       <div class="role-stats">
         <div class="stat-item">
           <i class="pi pi-users"></i>
@@ -37,21 +42,274 @@
         </div>
         <div class="stat-item">
           <i class="pi pi-calendar"></i>
-          <span>Created: {{ role.createdDate }}</span>
+          <span>Created: {{ formatDate(role.createdDate) }}</span>
         </div>
         <div class="stat-item">
-          <span class="status-badge status-active">{{ role.status }}</span>
+          <span class="status-badge" [ngClass]="getStatusClass(role.status)">{{ role.status }}</span>
         </div>
       </div>
 
       <div class="role-permissions">
-        <h4>Permissions:</h4>
+        <h4>Permissions ({{ role.permissions.length }}):</h4>
         <div class="permissions-list">
           <span *ngFor="let permission of role.permissions" class="permission-tag">
             {{ permission }}
           </span>
         </div>
       </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="roles.length === 0" class="empty-state">
+      <i class="pi pi-shield empty-icon"></i>
+      <h3>No roles found</h3>
+      <p>Create your first role to get started.</p>
+      <button class="apex-button apex-button-success" (click)="addRole()">
+        <i class="pi pi-plus"></i> Add First Role
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Role Modal -->
+<div class="modal-overlay" *ngIf="showRoleModal" (click)="closeModal()">
+  <div class="modal-container large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="pi pi-shield"></i>
+        {{ isEditing ? 'Edit Role' : 'Add New Role' }}
+      </h2>
+      <button class="modal-close" (click)="closeModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="roleForm" (ngSubmit)="saveRole()" class="modal-body">
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-info-circle"></i> Basic Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label required">Role Name</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="name"
+              [class.is-invalid]="isFieldInvalid('name')"
+              placeholder="Enter role name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+              <span *ngIf="roleForm.get('name')?.errors?.['required']">Role name is required</span>
+              <span *ngIf="roleForm.get('name')?.errors?.['minlength']">Role name must be at least 3 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label required">Status</label>
+            <select
+              class="form-control"
+              formControlName="status"
+              [class.is-invalid]="isFieldInvalid('status')"
+            >
+              <option value="">Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('status')">
+              Status is required
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label required">Description</label>
+            <textarea
+              class="form-control"
+              formControlName="description"
+              [class.is-invalid]="isFieldInvalid('description')"
+              rows="3"
+              placeholder="Describe the role and its responsibilities..."
+            ></textarea>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
+              <span *ngIf="roleForm.get('description')?.errors?.['required']">Description is required</span>
+              <span *ngIf="roleForm.get('description')?.errors?.['minlength']">Description must be at least 10 characters</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permissions Section -->
+      <div class="form-section">
+        <h3><i class="pi pi-key"></i> Permissions</h3>
+        <p class="form-help">Select the permissions this role should have. Choose carefully as these determine what users with this role can access.</p>
+
+        <div class="permissions-grid">
+          <!-- Dashboard Permissions -->
+          <div class="permission-category">
+            <h4>
+              <input
+                type="checkbox"
+                (change)="toggleCategoryPermissions('Dashboard', $event)"
+                [checked]="isCategorySelected('Dashboard')"
+                [indeterminate]="isCategoryIndeterminate('Dashboard')"
+              >
+              Dashboard
+            </h4>
+            <div class="permission-items">
+              <label *ngFor="let permission of getPermissionsByCategory()['Dashboard']" class="permission-item">
+                <input
+                  type="checkbox"
+                  [value]="permission"
+                  (change)="onPermissionChange(permission, $event)"
+                  [checked]="isPermissionSelected(permission)"
+                >
+                <span class="permission-label">{{ getPermissionLabel(permission) }}</span>
+                <span class="permission-description">{{ permission }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Users & Roles Permissions -->
+          <div class="permission-category">
+            <h4>
+              <input
+                type="checkbox"
+                (change)="toggleCategoryPermissions('Users', $event)"
+                [checked]="isCategorySelected('Users')"
+                [indeterminate]="isCategoryIndeterminate('Users')"
+              >
+              Users & Roles
+            </h4>
+            <div class="permission-items">
+              <label *ngFor="let permission of getPermissionsByCategory()['Users']" class="permission-item">
+                <input
+                  type="checkbox"
+                  [value]="permission"
+                  (change)="onPermissionChange(permission, $event)"
+                  [checked]="isPermissionSelected(permission)"
+                >
+                <span class="permission-label">{{ getPermissionLabel(permission) }}</span>
+                <span class="permission-description">{{ permission }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Employees Permissions -->
+          <div class="permission-category">
+            <h4>
+              <input
+                type="checkbox"
+                (change)="toggleCategoryPermissions('Employees', $event)"
+                [checked]="isCategorySelected('Employees')"
+                [indeterminate]="isCategoryIndeterminate('Employees')"
+              >
+              Employee Management
+            </h4>
+            <div class="permission-items">
+              <label *ngFor="let permission of getPermissionsByCategory()['Employees']" class="permission-item">
+                <input
+                  type="checkbox"
+                  [value]="permission"
+                  (change)="onPermissionChange(permission, $event)"
+                  [checked]="isPermissionSelected(permission)"
+                >
+                <span class="permission-label">{{ getPermissionLabel(permission) }}</span>
+                <span class="permission-description">{{ permission }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Reports Permissions -->
+          <div class="permission-category">
+            <h4>
+              <input
+                type="checkbox"
+                (change)="toggleCategoryPermissions('Reports', $event)"
+                [checked]="isCategorySelected('Reports')"
+                [indeterminate]="isCategoryIndeterminate('Reports')"
+              >
+              Reports & Analytics
+            </h4>
+            <div class="permission-items">
+              <label *ngFor="let permission of getPermissionsByCategory()['Reports']" class="permission-item">
+                <input
+                  type="checkbox"
+                  [value]="permission"
+                  (change)="onPermissionChange(permission, $event)"
+                  [checked]="isPermissionSelected(permission)"
+                >
+                <span class="permission-label">{{ getPermissionLabel(permission) }}</span>
+                <span class="permission-description">{{ permission }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Settings Permissions -->
+          <div class="permission-category">
+            <h4>
+              <input
+                type="checkbox"
+                (change)="toggleCategoryPermissions('Settings', $event)"
+                [checked]="isCategorySelected('Settings')"
+                [indeterminate]="isCategoryIndeterminate('Settings')"
+              >
+              System Settings
+            </h4>
+            <div class="permission-items">
+              <label *ngFor="let permission of getPermissionsByCategory()['Settings']" class="permission-item">
+                <input
+                  type="checkbox"
+                  [value]="permission"
+                  (change)="onPermissionChange(permission, $event)"
+                  [checked]="isPermissionSelected(permission)"
+                >
+                <span class="permission-label">{{ getPermissionLabel(permission) }}</span>
+                <span class="permission-description">{{ permission }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Permissions Summary -->
+        <div class="selected-permissions" *ngIf="selectedPermissions.length > 0">
+          <h4>Selected Permissions ({{ selectedPermissions.length }}):</h4>
+          <div class="selected-permissions-list">
+            <span
+              *ngFor="let permission of selectedPermissions"
+              class="selected-permission-tag"
+            >
+              {{ getPermissionLabel(permission) }}
+              <button
+                type="button"
+                class="remove-permission"
+                (click)="removePermission(permission)"
+              >
+                <i class="pi pi-times"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">
+        <i class="pi pi-times"></i> Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="!roleForm.valid || selectedPermissions.length === 0 || isLoading"
+        (click)="saveRole()"
+      >
+        <span *ngIf="!isLoading">
+          <i class="pi pi-save"></i>
+          {{ isEditing ? 'Update Role' : 'Create Role' }}
+        </span>
+        <span *ngIf="isLoading">
+          <i class="pi pi-spin pi-spinner"></i>
+          {{ isEditing ? 'Updating...' : 'Creating...' }}
+        </span>
+      </button>
     </div>
   </div>
 </div>

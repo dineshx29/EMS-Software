@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Backend Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button.secondary {
+            background: #6c757d;
+        }
+        
+        button.secondary:hover {
+            background: #545b62;
+        }
+        
+        button.success {
+            background: #28a745;
+        }
+        
+        button.success:hover {
+            background: #1e7e34;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .endpoint-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .endpoint-info h3 {
+            margin: 0 0 10px 0;
+            color: #0056b3;
+        }
+        
+        .endpoint-url {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EMS Backend Test & Debug Page</h1>
+        
+        <div class="endpoint-info">
+            <h3>Available Test Endpoints:</h3>
+            <div class="endpoint-url">GET /api/debug/connection - Test database connection</div><br>
+            <div class="endpoint-url">GET /api/debug/data - Get all tables and data</div><br>
+            <div class="endpoint-url">GET /api/debug/table/{tablename} - Get specific table data</div><br>
+            <div class="endpoint-url">POST /api/auth/login - Test login endpoint</div>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="testConnection()">Test DB Connection</button>
+            <button onclick="getAllData()" class="success">Get All Data</button>
+            <button onclick="testLogin()" class="secondary">Test Login</button>
+            <button onclick="getUsers()">Get Users Table</button>
+            <button onclick="getEmployees()">Get Employees Table</button>
+            <button onclick="getDepartments()">Get Departments Table</button>
+            <button onclick="getRoles()">Get Roles Table</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost/Projects/Project/backend/ems-api/public/api';
+        
+        function showStatus(message, type = 'loading') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+        
+        function hideStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+        
+        function displayOutput(data) {
+            document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+            hideStatus();
+        }
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                showStatus('Making request...', 'loading');
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showStatus(`✓ Request successful (${response.status})`, 'success');
+                } else {
+                    showStatus(`✗ Request failed (${response.status})`, 'error');
+                }
+                
+                displayOutput(data);
+                return data;
+            } catch (error) {
+                showStatus(`✗ Network error: ${error.message}`, 'error');
+                displayOutput({ error: error.message });
+                throw error;
+            }
+        }
+        
+        function testConnection() {
+            makeRequest(`${baseUrl}/debug/connection`);
+        }
+        
+        function getAllData() {
+            makeRequest(`${baseUrl}/debug/data`);
+        }
+        
+        function testLogin() {
+            makeRequest(`${baseUrl}/auth/login`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    username: 'admin',
+                    password: 'admin123'
+                })
+            });
+        }
+        
+        function getUsers() {
+            makeRequest(`${baseUrl}/debug/table/users`);
+        }
+        
+        function getEmployees() {
+            makeRequest(`${baseUrl}/debug/table/employees`);
+        }
+        
+        function getDepartments() {
+            makeRequest(`${baseUrl}/debug/table/departments`);
+        }
+        
+        function getRoles() {
+            makeRequest(`${baseUrl}/debug/table/roles`);
+        }
+        
+        // Auto-test connection on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

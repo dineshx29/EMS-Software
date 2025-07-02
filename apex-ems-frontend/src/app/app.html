@@ -1,87 +1,99 @@
-<!-- Top Navigation Bar -->
-<div class="apex-nav-header">
-  <div class="nav-header-left">
-    <div class="apex-logo">
-      <i class="pi pi-sitemap"></i>
-      <span>APEX EMS</span>
+<!-- Main App Content (Only show when authenticated) -->
+<div *ngIf="isAuthenticated$ | async" class="apex-app">
+  <!-- Top Navigation Bar -->
+  <div class="apex-nav-header">
+    <div class="nav-header-left">
+      <div class="apex-logo">
+        <i class="pi pi-sitemap"></i>
+        <span>APEX EMS</span>
+      </div>
+    </div>
+
+    <div class="nav-header-center">
+      <div class="apex-breadcrumb">
+        <span>Employee Management System</span>
+      </div>
+    </div>
+
+    <div class="nav-header-right">
+      <div class="user-info" *ngIf="currentUser$ | async as currentUser">
+        <app-notification-center></app-notification-center>
+        <span class="user-name">{{ currentUser.full_name }}</span>
+        <span class="user-role">{{ currentUser.roles.length > 0 ? currentUser.roles[0].name : 'No Role' }}</span>
+        <button class="apex-btn apex-btn-secondary" (click)="logout()">
+          <i class="pi pi-sign-out"></i>
+          Logout
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="nav-header-center">
-    <div class="apex-breadcrumb">
-      <span>Employee Management System</span>
-    </div>
-  </div>
+  <!-- Main Container -->
+  <div class="apex-container">
+    <!-- Sidebar Navigation -->
+    <nav class="apex-sidebar">
+      <div class="sidebar-header">
+        <h4>Navigation</h4>
+      </div>
 
-  <div class="nav-header-right">
-    <div class="user-info">
-      <span class="user-name">{{ currentUser.name }}</span>
-      <span class="user-role">{{ currentUser.role }}</span>
-      <button class="apex-btn apex-btn-secondary" (click)="logout()">
-        <i class="pi pi-sign-out"></i>
-        Logout
-      </button>
-    </div>
+      <ul class="sidebar-menu">
+        <li class="menu-item">
+          <a routerLink="/dashboard" routerLinkActive="active" class="menu-link">
+            <i class="pi pi-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a routerLink="/employees" routerLinkActive="active" class="menu-link">
+            <i class="pi pi-users"></i>
+            <span>Employees</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a routerLink="/users" routerLinkActive="active" class="menu-link">
+            <i class="pi pi-user"></i>
+            <span>Users</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a routerLink="/roles" routerLinkActive="active" class="menu-link">
+            <i class="pi pi-shield"></i>
+            <span>Roles</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a routerLink="/reports" routerLinkActive="active" class="menu-link">
+            <i class="pi pi-chart-bar"></i>
+            <span>Reports</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a routerLink="/settings" routerLinkActive="active" class="menu-link">
+            <i class="pi pi-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="apex-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
   </div>
 </div>
 
-<!-- Main Container -->
-<div class="apex-container">
-  <!-- Sidebar Navigation -->
-  <nav class="apex-sidebar">
-    <div class="sidebar-header">
-      <h4>Navigation</h4>
-    </div>
-
-    <ul class="sidebar-menu">
-      <li class="menu-item">
-        <a routerLink="/dashboard" routerLinkActive="active" class="menu-link">
-          <i class="pi pi-home"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-
-      <li class="menu-item">
-        <a routerLink="/employees" routerLinkActive="active" class="menu-link">
-          <i class="pi pi-users"></i>
-          <span>Employees</span>
-        </a>
-      </li>
-
-      <li class="menu-item">
-        <a routerLink="/users" routerLinkActive="active" class="menu-link">
-          <i class="pi pi-user"></i>
-          <span>Users</span>
-        </a>
-      </li>
-
-      <li class="menu-item">
-        <a routerLink="/roles" routerLinkActive="active" class="menu-link">
-          <i class="pi pi-shield"></i>
-          <span>Roles</span>
-        </a>
-      </li>
-
-      <li class="menu-item">
-        <a routerLink="/reports" routerLinkActive="active" class="menu-link">
-          <i class="pi pi-chart-bar"></i>
-          <span>Reports</span>
-        </a>
-      </li>
-
-      <li class="menu-item">
-        <a routerLink="/settings" routerLinkActive="active" class="menu-link">
-          <i class="pi pi-cog"></i>
-          <span>Settings</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-
-  <!-- Main Content Area -->
-  <main class="apex-content">
-    <div class="content-wrapper">
-      <router-outlet></router-outlet>
-    </div>
-  </main>
+<!-- Authentication Pages (Only show when NOT authenticated) -->
+<div *ngIf="!(isAuthenticated$ | async)" class="auth-container">
+  <router-outlet></router-outlet>
 </div>
+
+<!-- Toast Container (Always visible) -->
+<app-toast-container></app-toast-container>
