@@ -18,7 +18,6 @@ export class LoginComponent implements OnInit {
     password: ''
   };
 
-  rememberMe = false;
   showPassword = false;
   isLoading = false;
 
@@ -74,10 +73,6 @@ export class LoginComponent implements OnInit {
     } finally {
       this.isLoading = false;
     }
-  }
-
-  togglePassword(): void {
-    this.showPassword = !this.showPassword;
   }
 
   useDemoCredentials(): void {
